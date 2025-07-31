@@ -1,0 +1,170 @@
+[
+  {
+    "id": "q1",
+    "type": "question",
+    "text": {
+      "ko": "골격이 굵거나 살찐 편인가요?",
+      "pt": "Você tem ossos largos ou tende a ganhar peso facilmente?",
+      "en": "Do you have a large frame or tend to gain weight easily?",
+      "es": "¿Tienes una complexión grande o tiendes a ganar peso fácilmente?"
+    },
+    "yes": "q2",
+    "no": "q12"
+  },
+  {
+    "id": "q2",
+    "type": "question",
+    "text": {
+      "ko": "땀이 많으신가요?",
+      "pt": "Você transpira muito?",
+      "en": "Do you sweat a lot?",
+      "es": "¿Sudas mucho?"
+    },
+    "yes": "q3",
+    "no": "q5"
+  },
+  {
+    "id": "q3",
+    "type": "question",
+    "text": {
+      "ko": "소심하고 꼼꼼한 편인가요?",
+      "pt": "Você é meticuloso(a) e cauteloso(a)?",
+      "en": "Are you meticulous and cautious?",
+      "es": "¿Eres meticuloso(a) y cauteloso(a)?"
+    },
+    "yes": "r_sy",
+    "no": "q4"
+  },
+  {
+    "id": "q4",
+    "type": "question",
+    "text": {
+      "ko": "별생각 없이 많이 먹는 편인가요?",
+      "pt": "Você costuma comer muito, sem pensar muito?",
+      "en": "Do you tend to eat a lot without thinking?",
+      "es": "¿Tiendes a comer mucho sin pensarlo?"
+    },
+    "yes": "r_ty",
+    "no": "r_te"
+  },
+  {
+    "id": "q5",
+    "type": "question",
+    "text": {
+      "ko": "집중하면 실수를 자주 하나요?",
+      "pt": "Você costuma cometer erros ao se concentrar?",
+      "en": "Do you often make mistakes when focusing?",
+      "es": "¿Cometes errores a menudo cuando te concentras?"
+    },
+    "yes": "r_sy",
+    "no": "r_te"
+  },
+  {
+    "id": "q12",
+    "type": "question",
+    "text": {
+      "ko": "손발이 찬 편인가요?",
+      "pt": "Você tem mãos e pés frios?",
+      "en": "Do you have cold hands and feet?",
+      "es": "¿Tienes manos y pies fríos?"
+    },
+    "yes": "q13",
+    "no": "q17"
+  },
+  {
+    "id": "q13",
+    "type": "question",
+    "text": {
+      "ko": "식욕이 적은 편인가요?",
+      "pt": "Você tem pouco apetite?",
+      "en": "Do you have a small appetite?",
+      "es": "¿Tienes poco apetito?"
+    },
+    "yes": "r_se",
+    "no": "q14"
+  },
+  {
+    "id": "q14",
+    "type": "question",
+    "text": {
+      "ko": "완벽주의적인가요?",
+      "pt": "Você é perfeccionista?",
+      "en": "Are you a perfectionist?",
+      "es": "¿Eres perfeccionista?"
+    },
+    "yes": "q15",
+    "no": "r_sy"
+  },
+  {
+    "id": "q15",
+    "type": "question",
+    "text": {
+      "ko": "소화가 약하고 쉽게 체하나요?",
+      "pt": "Você tem digestão fraca ou fica enjoado(a) com facilidade?",
+      "en": "Do you have weak digestion or get nauseous easily?",
+      "es": "¿Tienes una digestión débil o te mareas fácilmente?"
+    },
+    "yes": "r_se",
+    "no": "r_ty"
+  },
+  {
+    "id": "q17",
+    "type": "question",
+    "text": {
+      "ko": "금방 사람과 친해지나요?",
+      "pt": "Você se conecta rapidamente com as pessoas?",
+      "en": "Do you get along with people quickly?",
+      "es": "¿Te llevas bien con la gente rápidamente?"
+    },
+    "yes": "q18",
+    "no": "q20"
+  },
+  {
+    "id": "q18",
+    "type": "question",
+    "text": {
+      "ko": "신체적 불편이 있으면 식욕이 떨어지나요?",
+      "pt": "Se você se sente desconfortável fisicamente, perde o apetite?",
+      "en": "Do you lose your appetite when you feel physically uncomfortable?",
+      "es": "¿Pierdes el apetito cuando te sientes incómodo(a) físicamente?"
+    },
+    "yes": "r_te",
+    "no": "q19"
+  },
+  {
+    "id": "q19",
+    "type": "question",
+    "text": {
+      "ko": "일을 마무리하기 어려운 편인가요?",
+      "pt": "Você tem dificuldade para terminar suas tarefas?",
+      "en": "Do you have difficulty finishing tasks?",
+      "es": "¿Tienes dificultad para terminar tareas?"
+    },
+    "yes": "r_sy",
+    "no": "r_ty"
+  },
+  {
+    "id": "q20",
+    "type": "question",
+    "text": {
+      "ko": "게으르고 움직이기 싫은 편인가요?",
+      "pt": "Você é preguiçoso(a) e não gosta de se mover?",
+      "en": "Are you lazy and dislike moving?",
+      "es": "¿Eres perezoso(a) y no te gusta moverte?"
+    },
+    "yes": "q21",
+    "no": "r_te"
+  },
+  {
+    "id": "q21",
+    "type": "question",
+    "text": {
+      "ko": "마음에 상처를 받으면 오래가나요?",
+      "pt": "Você demora muito para se recuperar quando se machuca emocionalmente?",
+      "en": "Do you take a long time to recover from emotional wounds?",
+      "es": "¿Te toma mucho tiempo recuperarte de heridas emocionales?"
+    },
+    "yes": "r_sy",
+    "no": "r_se"
+  }
+]
