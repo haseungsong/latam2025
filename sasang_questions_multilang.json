@@ -167,4 +167,69 @@
     "yes": "r_sy",
     "no": "r_se"
   }
+,
+  {
+    "id": "r_sy",
+    "type": "result",
+    "result": {
+      "ko": "소양인",
+      "pt": "So-Yang-In",
+      "en": "So-Yang-In",
+      "es": "So-Yang-In"
+    },
+    "description": {
+      "ko": "활동적이고 외향적인 성격이며 상체에 열이 많은 편입니다.",
+      "pt": "Pessoa ativa, extrovertida, geralmente com calor na parte superior do corpo.",
+      "en": "An active and extroverted person, often with heat in the upper body.",
+      "es": "Una persona activa y extrovertida, a menudo con calor en la parte superior del cuerpo."
+    }
+  },
+  {
+    "id": "r_se",
+    "type": "result",
+    "result": {
+      "ko": "소음인",
+      "pt": "So-Eum-In",
+      "en": "So-Eum-In",
+      "es": "So-Eum-In"
+    },
+    "description": {
+      "ko": "신중하고 내성적인 성격이며 소화 기능이 약한 경향이 있습니다.",
+      "pt": "Pessoa cautelosa, introvertida e com tendência a ter digestão fraca.",
+      "en": "A cautious and introverted person with a tendency for weak digestion.",
+      "es": "Una persona cautelosa e introvertida con tendencia a una digestión débil."
+    }
+  },
+  {
+    "id": "r_ty",
+    "type": "result",
+    "result": {
+      "ko": "태양인",
+      "pt": "Tae-Yang-In",
+      "en": "Tae-Yang-In",
+      "es": "Tae-Yang-In"
+    },
+    "description": {
+      "ko": "리더십이 강하고 추진력이 있으나 간 기능이 약한 체질입니다.",
+      "pt": "Pessoa com forte liderança e iniciativa, mas com fraqueza hepática.",
+      "en": "A strong leader with initiative, but with weak liver function.",
+      "es": "Líder fuerte con iniciativa, pero con debilidad hepática."
+    }
+  },
+  {
+    "id": "r_te",
+    "type": "result",
+    "result": {
+      "ko": "태음인",
+      "pt": "Tae-Eum-In",
+      "en": "Tae-Eum-In",
+      "es": "Tae-Eum-In"
+    },
+    "description": {
+      "ko": "신체가 튼튼하고 인내심이 강하지만 폐 기능이 약한 편입니다.",
+      "pt": "Pessoa robusta e persistente, mas com função pulmonar fraca.",
+      "en": "A robust and patient person with weak lung function.",
+      "es": "Una persona robusta y paciente, pero con función pulmonar débil."
+    }
+  }
 ]
