@@ -46,20 +46,23 @@ function showQuestion(nodeId) {
   if (!node) return;
 
   if (node.type === 'question') {
-    // 질문 노드일 경우
     questionText.innerText = node.text[language];
+
+    // 화면 전환
     startScreen.classList.add('hidden');
     resultScreen.classList.add('hidden');
     questionScreen.classList.remove('hidden');
-    startBtn.classList.add('hidden'); // ✅ 시작 버튼 숨기기
+
+    // ✅ 시작 버튼과 언어 선택 숨김
+    startBtn.classList.add('hidden');
+    document.getElementById('languageSelect').classList.add('hidden');
+
+    // ✅ 타이틀은 계속 보이도록 (숨기지 않음)
   } else if (node.type === 'result') {
-    // 결과 노드일 경우
     resultTitle.innerText = node.result[language];
     resultDesc.innerText = node.description[language];
 
     const resultDetails = document.getElementById('resultDetails');
-
-    // 🔸 details 필드가 존재하는지 확인 후 출력
     if (node.details && node.details[language]) {
       resultDetails.innerText = node.details[language];
       resultDetails.classList.remove('hidden');
@@ -72,6 +75,7 @@ function showQuestion(nodeId) {
     resultScreen.classList.remove('hidden');
   }
 }
+
 
 
 // 시작 버튼 클릭
@@ -100,6 +104,7 @@ restartBtn.addEventListener('click', () => {
   resultScreen.classList.add('hidden');
   questionScreen.classList.add('hidden');
   startBtn.classList.remove('hidden'); // ✅ 시작 버튼 다시 보이기
+  document.getElementById('languageSelect').classList.remove('hidden');
 });
 
 // 🔸 언어 선택 시 설명도 업데이트
