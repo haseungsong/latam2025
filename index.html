@@ -8,8 +8,18 @@
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
 
+
+
+  
   <!-- App Container -->
   <div id="app" class="w-full max-w-sm bg-white rounded-xl shadow-md p-6 text-center space-y-6">
+    
+
+    
+    <!-- 시작 화면 -->
+    <div id="startScreen">
+      <h1 id="startTitle" class="text-2xl font-bold mb-6">📋 나의 사상체질 알아보기</h1>
+    </div>
 
     <!-- 언어 선택 -->
       <div id="languageSelect" class="mb-4">
@@ -27,15 +37,9 @@
         <!-- 여기에 언어별 설명이 동적으로 삽입됩니다 -->
       </div>
 
-
-    <!-- 시작 화면 -->
-    <div id="startScreen">
-      <h1 id="titleText" class="text-2xl font-bold mb-6">📋 나의 사상체질 알아보기</h1>
       <button id="startBtn" class="bg-blue-600 text-white text-xl px-6 py-4 rounded-lg w-full hover:bg-blue-700">
         시작하기 / Start
       </button>
-    </div>
-
     <!-- 질문 화면 -->
     <div id="questionScreen" class="hidden">
       <p id="questionText" class="text-xl font-semibold mb-8 leading-relaxed">질문 내용</p>
