@@ -24,6 +24,14 @@ const descriptions = {
   es: "Sasang es una clasificación tradicional coreana que divide a las personas en cuatro tipos según su personalidad y salud."
 };
 
+// 🔸 언어별 시작화면 타이틀
+const titles = {
+  ko: "📋 나의 사상체질 알아보기",
+  pt: "📋 Descubra seu tipo de Sasang",
+  en: "📋 Discover Your Sasang Type",
+  es: "📋 Descubre tu tipo Sasang"
+};
+
 // JSON 로드
 fetch('sasang_questions_multilang.json')
   .then(res => res.json())
@@ -38,20 +46,32 @@ function showQuestion(nodeId) {
   if (!node) return;
 
   if (node.type === 'question') {
+    // 질문 노드일 경우
     questionText.innerText = node.text[language];
     startScreen.classList.add('hidden');
     resultScreen.classList.add('hidden');
     questionScreen.classList.remove('hidden');
   } else if (node.type === 'result') {
+    // 결과 노드일 경우
     resultTitle.innerText = node.result[language];
     resultDesc.innerText = node.description[language];
 
     const resultDetails = document.getElementById('resultDetails');
-    resultDetails.innerText = node.details[language]; // ✅ details 필드 추가 표시
+
+    // 🔸 details 필드가 존재하는지 확인 후 출력
+    if (node.details && node.details[language]) {
+      resultDetails.innerText = node.details[language];
+      resultDetails.classList.remove('hidden');
+    } else {
+      resultDetails.innerText = '';
+      resultDetails.classList.add('hidden');
+    }
+
     questionScreen.classList.add('hidden');
     resultScreen.classList.remove('hidden');
   }
 }
+
 
 // 시작 버튼 클릭
 startBtn.addEventListener('click', () => {
@@ -83,9 +103,11 @@ restartBtn.addEventListener('click', () => {
 // 🔸 언어 선택 시 설명도 업데이트
 langSelect.addEventListener('change', () => {
   descriptionBox.innerText = descriptions[langSelect.value];
+  document.getElementById('titleText').innerText = titles[langSelect.value];  // 🔸 타이틀 변경
 });
 
 // 🔸 페이지 로딩 시 설명 표시
 window.addEventListener("DOMContentLoaded", () => {
   descriptionBox.innerText = descriptions[langSelect.value];
+  document.getElementById('titleText').innerText = titles[langSelect.value];  // 🔸 추가
 });
