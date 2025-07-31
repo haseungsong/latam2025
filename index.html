@@ -6,8 +6,8 @@
   <title>Conference Program</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
-  <div id="mainContainer" class="w-full max-w-sm bg-white p-6 rounded-xl shadow text-center space-y-4">
+<body class="bg-gray-100 min-h-screen relative p-4">
+  <div id="mainContainer" class="w-full max-w-sm bg-white p-6 rounded-xl shadow text-center mx-auto space-y-4">
 
     <!-- 🔹 Full Program Button -->
     <div class="mb-4">
@@ -41,7 +41,11 @@
       <p class="text-gray-700">Experience Korea's medical innovation and health tech culture.</p>
       <button id="backBtnFromKwave" class="w-full py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400">🔙 Back</button>
     </div>
+  </div>
 
+  <!-- ✅ 하단 배너: 콘텐츠 아래 중앙 정렬 -->
+  <div class="mt-6">
+    <img src="assets/LOGO_JOURNEY_branco.png" alt="Journey Logo" class="mx-auto w-32 opacity-90">
   </div>
 
   <script>
@@ -50,46 +54,35 @@
     const kwaveScreen = document.getElementById('kwaveScreen');
     const subtitle = document.getElementById('subtitle');
 
-    // Day 2 clicked
     document.getElementById('day2Btn').addEventListener('click', () => {
       dayMenu.classList.add('hidden');
       day2Submenu.classList.remove('hidden');
       subtitle.innerText = 'Day 2 Program';
     });
 
-    // Back from Day 2 submenu
     document.getElementById('backBtnFromDay2').addEventListener('click', () => {
       day2Submenu.classList.add('hidden');
       dayMenu.classList.remove('hidden');
       subtitle.innerText = 'Please select a day';
     });
 
-    // K-Wave button clicked
     document.getElementById('kwaveBtn').addEventListener('click', () => {
       day2Submenu.classList.add('hidden');
       kwaveScreen.classList.remove('hidden');
       subtitle.innerText = 'K-Wave Experience';
     });
 
-    // Back from K-Wave screen
     document.getElementById('backBtnFromKwave').addEventListener('click', () => {
       kwaveScreen.classList.add('hidden');
       day2Submenu.classList.remove('hidden');
       subtitle.innerText = 'Day 2 Program';
     });
 
-    // 🔸 Full Program Button Action
     document.getElementById('fullProgramBtn').addEventListener('click', () => {
       alert("Full program coming soon!");
-      // 또는 window.location.href = "full-program.html";
     });
   </script>
-
-  <!-- 하단 배너 -->
-    <div class="mt-6">
-      <img src="assets/LOGO_JOURNEY_branco.png" alt="Journey Logo" class="mx-auto w-40 opacity-90">
-    </div>
 </body>
-</html>
 
+</html>
 
