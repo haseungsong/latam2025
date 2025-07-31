@@ -51,6 +51,7 @@ function showQuestion(nodeId) {
     startScreen.classList.add('hidden');
     resultScreen.classList.add('hidden');
     questionScreen.classList.remove('hidden');
+    startBtn.classList.add('hidden'); // ✅ 시작 버튼 숨기기
   } else if (node.type === 'result') {
     // 결과 노드일 경우
     resultTitle.innerText = node.result[language];
@@ -98,6 +99,7 @@ restartBtn.addEventListener('click', () => {
   startScreen.classList.remove('hidden');
   resultScreen.classList.add('hidden');
   questionScreen.classList.add('hidden');
+  startBtn.classList.remove('hidden'); // ✅ 시작 버튼 다시 보이기
 });
 
 // 🔸 언어 선택 시 설명도 업데이트
