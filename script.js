@@ -103,7 +103,8 @@ restartBtn.addEventListener('click', () => {
 // 🔸 언어 선택 시 설명도 업데이트
 langSelect.addEventListener('change', () => {
   descriptionBox.innerText = descriptions[langSelect.value];
-  document.getElementById('titleText').innerText = titles[langSelect.value];  // 🔸 타이틀 변경
+  document.getElementById('startTitle').innerText = titles[langSelect.value];
+  // 🔸 타이틀 변경
 });
 
 // 🔸 페이지 로딩 시 설명 표시
