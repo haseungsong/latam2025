@@ -182,6 +182,12 @@
       "pt": "Pessoa ativa, extrovertida, geralmente com calor na parte superior do corpo.",
       "en": "An active and extroverted person, often with heat in the upper body.",
       "es": "Una persona activa y extrovertida, a menudo con calor en la parte superior del cuerpo."
+    },
+    "details": {
+      "ko": "🍽 식습관: 찬 음식은 피하고 따뜻하고 담백한 음식을 섭취하세요.\n🏃 운동: 격렬한 운동보다는 요가나 스트레칭이 좋습니다.\n🧘 생활 팁: 과도한 활동보다는 휴식과 수분 보충이 중요합니다.",
+      "pt": "🍽 Alimentação: Evite alimentos frios e prefira pratos leves e quentes.\n🏃 Exercício: Yoga e alongamentos são ideais.\n🧘 Dica: Priorize o descanso e hidratação em vez de atividades intensas.",
+      "en": "🍽 Diet: Avoid cold foods and choose warm, light meals.\n🏃 Exercise: Yoga and stretching are ideal.\n🧘 Tip: Focus on rest and hydration over intense activity.",
+      "es": "🍽 Alimentación: Evita alimentos fríos y opta por comidas cálidas y ligeras.\n🏃 Ejercicio: Yoga y estiramientos son recomendados.\n🧘 Consejo: Prioriza el descanso y la hidratación sobre actividades intensas."
     }
   },
   {
@@ -198,6 +204,12 @@
       "pt": "Pessoa cautelosa, introvertida e com tendência a ter digestão fraca.",
       "en": "A cautious and introverted person with a tendency for weak digestion.",
       "es": "Una persona cautelosa e introvertida con tendencia a una digestión débil."
+    },
+    "details": {
+      "ko": "🍽 식습관: 따뜻하고 소화 잘 되는 죽, 밥 위주로 드세요.\n🏃 운동: 체조나 실내 자전거 등 가벼운 운동을 추천합니다.\n🧘 생활 팁: 규칙적인 식사와 충분한 수면이 중요합니다.",
+      "pt": "🍽 Alimentação: Prefira refeições mornas e de fácil digestão, como sopas e arroz.\n🏃 Exercício: Atividades leves como ginástica ou bicicleta ergométrica.\n🧘 Dica: Mantenha refeições regulares e durma bem.",
+      "en": "🍽 Diet: Prefer warm, easily digestible foods like rice and porridge.\n🏃 Exercise: Light activities like gymnastics or indoor cycling.\n🧘 Tip: Maintain regular meals and sleep schedules.",
+      "es": "🍽 Alimentación: Prefiere comidas calientes y fáciles de digerir como sopas y arroz.\n🏃 Ejercicio: Actividades ligeras como gimnasia o bicicleta estática.\n🧘 Consejo: Mantén comidas regulares y buen descanso."
     }
   },
   {
@@ -214,6 +226,12 @@
       "pt": "Pessoa com forte liderança e iniciativa, mas com fraqueza hepática.",
       "en": "A strong leader with initiative, but with weak liver function.",
       "es": "Líder fuerte con iniciativa, pero con debilidad hepática."
+    },
+    "details": {
+      "ko": "🍽 식습관: 지방과 알코올을 피하고 해조류와 녹황색 채소를 섭취하세요.\n🏃 운동: 땀이 많이 나는 유산소 운동이 간 해독에 도움됩니다.\n🧘 생활 팁: 과도한 스트레스를 피하고 명상 등을 시도해보세요.",
+      "pt": "🍽 Alimentação: Evite gordura e álcool. Consuma algas e vegetais verdes.\n🏃 Exercício: Exercícios aeróbicos ajudam na desintoxicação do fígado.\n🧘 Dica: Evite estresse excessivo e pratique meditação.",
+      "en": "🍽 Diet: Avoid fats and alcohol. Eat seaweed and leafy greens.\n🏃 Exercise: Aerobic workouts help detox the liver.\n🧘 Tip: Avoid excessive stress and try meditation.",
+      "es": "🍽 Alimentación: Evita grasas y alcohol. Consume algas y verduras verdes.\n🏃 Ejercicio: Ejercicios aeróbicos ayudan a desintoxicar el hígado.\n🧘 Consejo: Evita el estrés excesivo y prueba meditación."
     }
   },
   {
@@ -230,6 +248,12 @@
       "pt": "Pessoa robusta e persistente, mas com função pulmonar fraca.",
       "en": "A robust and patient person with weak lung function.",
       "es": "Una persona robusta y paciente, pero con función pulmonar débil."
+    },
+    "details": {
+      "ko": "🍽 식습관: 기름기 많은 음식은 피하고 채소 위주 식사를 추천합니다.\n🏃 운동: 유산소 운동과 가벼운 등산이 좋습니다.\n🧘 생활 팁: 규칙적인 수면과 스트레스 관리가 중요합니다.",
+      "pt": "🍽 Alimentação: Evite comidas gordurosas e prefira vegetais.\n🏃 Exercício: Caminhadas leves e exercícios aeróbicos são recomendados.\n🧘 Dica: Durma regularmente e gerencie o estresse.",
+      "en": "🍽 Diet: Avoid greasy food and prefer vegetable-based meals.\n🏃 Exercise: Light hiking and aerobic exercises are helpful.\n🧘 Tip: Keep a regular sleep schedule and manage stress.",
+      "es": "🍽 Alimentación: Evita comidas grasosas y prefiere vegetales.\n🏃 Ejercicio: Caminatas ligeras y ejercicios aeróbicos son útiles.\n🧘 Consejo: Mantén un horario regular de sueño y controla el estrés."
     }
   }
 ]
