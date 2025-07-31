@@ -1,70 +1,95 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>사상체질 테스트</title>
+  <title>Conference Program</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+  <div id="mainContainer" class="w-full max-w-sm bg-white p-6 rounded-xl shadow text-center space-y-4">
 
-
-
-  
-  <!-- App Container -->
-  <div id="app" class="w-full max-w-sm bg-white rounded-xl shadow-md p-6 text-center space-y-6">
-    
-
-    
-    <!-- 시작 화면 -->
-    <div id="startScreen">
-      <h1 id="startTitle" class="text-2xl font-bold mb-6">📋 나의 사상체질 알아보기</h1>
-    </div>
-
-    <!-- 언어 선택 -->
-      <div id="languageSelect" class="mb-4">
-        <label for="lang" class="block text-lg font-semibold mb-2">🌐 언어 선택 / Select Language:</label>
-        <select id="lang" class="w-full p-3 text-lg border rounded">
-          <option value="ko">한국어</option>
-          <option value="pt">Português</option>
-          <option value="en">English</option>
-          <option value="es">Español</option>
-        </select>
-      </div>
-
-      <!-- 🔸 설명 박스 추가 -->
-      <div id="descriptionBox" class="text-base text-gray-700 mb-6 leading-relaxed">
-        <!-- 여기에 언어별 설명이 동적으로 삽입됩니다 -->
-      </div>
-
-      <button id="startBtn" class="bg-blue-600 text-white text-xl px-6 py-4 rounded-lg w-full hover:bg-blue-700">
-        시작하기 / Start
+    <!-- 🔹 Full Program Button -->
+    <div class="mb-4">
+      <button id="fullProgramBtn" class="w-full py-3 bg-yellow-200 text-yellow-800 font-semibold rounded hover:bg-yellow-300">
+        📅 View Full Program
       </button>
-    <!-- 질문 화면 -->
-    <div id="questionScreen" class="hidden">
-      <p id="questionText" class="text-xl font-semibold mb-8 leading-relaxed">질문 내용</p>
-      <div class="flex flex-col gap-4">
-        <button id="yesBtn" class="bg-green-500 text-white text-xl py-4 rounded-lg hover:bg-green-600">
-          ✅ 예 / Yes
-        </button>
-        <button id="noBtn" class="bg-red-500 text-white text-xl py-4 rounded-lg hover:bg-red-600">
-          ❌ 아니오 / No
-        </button>
-      </div>
     </div>
 
-    <!-- 결과 화면 -->
-    <div id="resultScreen" class="hidden space-y-4">
-      <h2 id="resultTitle" class="text-2xl font-bold text-blue-700"></h2>
-      <p id="resultDesc" class="text-base text-gray-800 leading-relaxed"></p>
-      <pre id="resultDetails" class="text-sm text-left bg-gray-100 p-4 rounded-lg whitespace-pre-wrap font-sans text-gray-700"></pre>  <!-- ✅ 보기 좋게 -->
-      <button id="restartBtn" class="bg-gray-600 text-white py-3 px-5 rounded hover:bg-gray-700">🔄 다시 시작 Restart</button>
+    <!-- Title -->
+    <h1 class="text-2xl font-bold">LATAM Conference 2025</h1>
+    <p id="subtitle" class="text-gray-600">Please select a day</p>
+
+    <!-- Day Selection -->
+    <div id="dayMenu" class="space-y-3">
+      <button class="w-full py-3 bg-gray-200 text-lg font-semibold rounded hover:bg-gray-300">Day 1</button>
+      <button id="day2Btn" class="w-full py-3 bg-gray-200 text-lg font-semibold rounded hover:bg-gray-300">Day 2</button>
+      <button class="w-full py-3 bg-gray-200 text-lg font-semibold rounded hover:bg-gray-300">Day 3</button>
     </div>
 
+    <!-- Day2 submenu -->
+    <div id="day2Submenu" class="space-y-3 hidden">
+      <button id="kwaveBtn" class="w-full py-3 bg-blue-100 text-blue-700 font-semibold rounded hover:bg-blue-200">
+        K-Wave (K-Medical)
+      </button>
+      <button id="backBtnFromDay2" class="w-full py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400">🔙 Back</button>
+    </div>
+
+    <!-- K-Wave content screen -->
+    <div id="kwaveScreen" class="hidden space-y-4">
+      <h2 class="text-xl font-bold text-blue-700">K-Wave: K-Medical</h2>
+      <p class="text-gray-700">Experience Korea's medical innovation and health tech culture.</p>
+      <button id="backBtnFromKwave" class="w-full py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400">🔙 Back</button>
+    </div>
 
   </div>
 
-  <!-- 스크립트 연결 -->
-  <script src="script.js"></script>
+  <script>
+    const dayMenu = document.getElementById('dayMenu');
+    const day2Submenu = document.getElementById('day2Submenu');
+    const kwaveScreen = document.getElementById('kwaveScreen');
+    const subtitle = document.getElementById('subtitle');
+
+    // Day 2 clicked
+    document.getElementById('day2Btn').addEventListener('click', () => {
+      dayMenu.classList.add('hidden');
+      day2Submenu.classList.remove('hidden');
+      subtitle.innerText = 'Day 2 Program';
+    });
+
+    // Back from Day 2 submenu
+    document.getElementById('backBtnFromDay2').addEventListener('click', () => {
+      day2Submenu.classList.add('hidden');
+      dayMenu.classList.remove('hidden');
+      subtitle.innerText = 'Please select a day';
+    });
+
+    // K-Wave button clicked
+    document.getElementById('kwaveBtn').addEventListener('click', () => {
+      day2Submenu.classList.add('hidden');
+      kwaveScreen.classList.remove('hidden');
+      subtitle.innerText = 'K-Wave Experience';
+    });
+
+    // Back from K-Wave screen
+    document.getElementById('backBtnFromKwave').addEventListener('click', () => {
+      kwaveScreen.classList.add('hidden');
+      day2Submenu.classList.remove('hidden');
+      subtitle.innerText = 'Day 2 Program';
+    });
+
+    // 🔸 Full Program Button Action
+    document.getElementById('fullProgramBtn').addEventListener('click', () => {
+      alert("Full program coming soon!");
+      // 또는 window.location.href = "full-program.html";
+    });
+  </script>
+
+  <!-- 하단 배너 -->
+    <div class="mt-6">
+      <img src="assets/LOGO_JOURNEY_branco.png" alt="Journey Logo" class="mx-auto w-40 opacity-90">
+    </div>
 </body>
 </html>
+
+
