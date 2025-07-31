@@ -1,20 +1,20 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sasang Test</title>
+  <title>사상체질 테스트</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center p-4">
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
 
   <!-- App Container -->
-  <div id="app" class="w-full max-w-md bg-white rounded-xl shadow-md p-6 text-center">
+  <div id="app" class="w-full max-w-sm bg-white rounded-xl shadow-md p-6 text-center space-y-6">
 
     <!-- 언어 선택 -->
-    <div id="languageSelect" class="mb-4">
-      <label for="lang" class="block text-sm font-semibold mb-2">🌐 언어 선택 / Select Language:</label>
-      <select id="lang" class="w-full p-2 border rounded">
+    <div id="languageSelect">
+      <label for="lang" class="block text-lg font-semibold mb-2">🌐 언어 선택 / Select Language:</label>
+      <select id="lang" class="w-full p-3 text-lg border rounded">
         <option value="ko">한국어</option>
         <option value="pt">Português</option>
         <option value="en">English</option>
@@ -24,27 +24,31 @@
 
     <!-- 시작 화면 -->
     <div id="startScreen">
-      <h1 class="text-xl font-bold mb-4">나의 사상체질 알아보기</h1>
-      <button id="startBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+      <h1 class="text-2xl font-bold mb-6">📋 나의 사상체질 알아보기</h1>
+      <button id="startBtn" class="bg-blue-600 text-white text-xl px-6 py-4 rounded-lg w-full hover:bg-blue-700">
         시작하기 / Start
       </button>
     </div>
 
     <!-- 질문 화면 -->
     <div id="questionScreen" class="hidden">
-      <p id="questionText" class="text-lg font-medium mb-6">질문 내용</p>
-      <div class="flex gap-4 justify-center">
-        <button id="yesBtn" class="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600">예 / Yes</button>
-        <button id="noBtn" class="bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600">아니오 / No</button>
+      <p id="questionText" class="text-xl font-semibold mb-8 leading-relaxed">질문 내용</p>
+      <div class="flex flex-col gap-4">
+        <button id="yesBtn" class="bg-green-500 text-white text-xl py-4 rounded-lg hover:bg-green-600">
+          ✅ 예 / Yes
+        </button>
+        <button id="noBtn" class="bg-red-500 text-white text-xl py-4 rounded-lg hover:bg-red-600">
+          ❌ 아니오 / No
+        </button>
       </div>
     </div>
 
     <!-- 결과 화면 -->
     <div id="resultScreen" class="hidden">
-      <h2 id="resultTitle" class="text-2xl font-bold mb-2">결과 체질</h2>
-      <p id="resultDesc" class="text-base mb-6">설명 내용</p>
-      <button id="restartBtn" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">
-        다시 시작하기 / Restart
+      <h2 id="resultTitle" class="text-2xl font-bold mb-4">🔍 결과 체질</h2>
+      <p id="resultDesc" class="text-lg mb-6 leading-relaxed">설명 내용</p>
+      <button id="restartBtn" class="bg-gray-600 text-white text-lg px-6 py-3 rounded-lg hover:bg-gray-700">
+        🔁 다시 시작하기 / Restart
       </button>
     </div>
 
