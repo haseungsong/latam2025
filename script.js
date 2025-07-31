@@ -45,6 +45,9 @@ function showQuestion(nodeId) {
   } else if (node.type === 'result') {
     resultTitle.innerText = node.result[language];
     resultDesc.innerText = node.description[language];
+
+    const resultDetails = document.getElementById('resultDetails');
+    resultDetails.innerText = node.details[language]; // ✅ details 필드 추가 표시
     questionScreen.classList.add('hidden');
     resultScreen.classList.remove('hidden');
   }
