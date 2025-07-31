@@ -107,8 +107,9 @@ langSelect.addEventListener('change', () => {
   // 🔸 타이틀 변경
 });
 
-// 🔸 페이지 로딩 시 설명 표시
+// 🔸 페이지 로딩 시 설명과 타이틀 표시
 window.addEventListener("DOMContentLoaded", () => {
   descriptionBox.innerText = descriptions[langSelect.value];
-  document.getElementById('titleText').innerText = titles[langSelect.value];  // 🔸 추가
+  document.getElementById('startTitle').innerText = titles[langSelect.value];  // ✅ 올바른 ID로 수정
 });
+
