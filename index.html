@@ -66,10 +66,9 @@
       subtitle.innerText = 'Please select a day';
     });
 
+    // ✅ 변경 후 코드 (sasang.html로 이동)
     document.getElementById('kwaveBtn').addEventListener('click', () => {
-      day2Submenu.classList.add('hidden');
-      kwaveScreen.classList.remove('hidden');
-      subtitle.innerText = 'K-Wave Experience';
+      window.location.href = 'sasang.html';
     });
 
     document.getElementById('backBtnFromKwave').addEventListener('click', () => {
