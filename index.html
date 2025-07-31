@@ -12,15 +12,21 @@
   <div id="app" class="w-full max-w-sm bg-white rounded-xl shadow-md p-6 text-center space-y-6">
 
     <!-- 언어 선택 -->
-    <div id="languageSelect">
-      <label for="lang" class="block text-lg font-semibold mb-2">🌐 언어 선택 / Select Language:</label>
-      <select id="lang" class="w-full p-3 text-lg border rounded">
-        <option value="ko">한국어</option>
-        <option value="pt">Português</option>
-        <option value="en">English</option>
-        <option value="es">Español</option>
-      </select>
-    </div>
+      <div id="languageSelect" class="mb-4">
+        <label for="lang" class="block text-lg font-semibold mb-2">🌐 언어 선택 / Select Language:</label>
+        <select id="lang" class="w-full p-3 text-lg border rounded">
+          <option value="ko">한국어</option>
+          <option value="pt">Português</option>
+          <option value="en">English</option>
+          <option value="es">Español</option>
+        </select>
+      </div>
+
+      <!-- 🔸 설명 박스 추가 -->
+      <div id="descriptionBox" class="text-base text-gray-700 mb-6 leading-relaxed">
+        <!-- 여기에 언어별 설명이 동적으로 삽입됩니다 -->
+      </div>
+
 
     <!-- 시작 화면 -->
     <div id="startScreen">
