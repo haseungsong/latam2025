@@ -89,12 +89,20 @@
       alert("Full program coming soon!");
     });
   </script>
+  
+  <!-- ✅ 고정 하단 버튼 그룹 (환율 + SOS) -->
+  <div class="fixed bottom-6 right-6 flex gap-4 z-50">
+    <!-- 🔹 환율 버튼 (exchange.html 이동) -->
+    <a href="exchange.html"
+      class="w-16 h-16 bg-blue-600 rounded-full shadow-lg flex items-center justify-center text-white text-sm font-semibold hover:bg-blue-700">
+      1$
+    </a>
 
-  <!-- ✅ SOS 아이콘 (gps.html로 이동) -->
-  <a href="gps.html" id="sosButton"
-     class="fixed bottom-6 right-6 w-16 h-16 bg-red-600 rounded-full shadow-lg flex items-center justify-center text-white text-xl font-bold hover:bg-red-700 z-50">
-    SOS
-  </a>
+    <!-- 🔴 SOS 버튼 (gps.html 이동) -->
+    <a href="gps.html"
+      class="w-16 h-16 bg-red-600 rounded-full shadow-lg flex items-center justify-center text-white text-xl font-bold hover:bg-red-700">
+      SOS
+    </a>
 </body>
 
 </html>
