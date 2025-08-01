@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ask AI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col justify-center items-center p-4">
+
+  <!-- 🧠 GPT Q&A 카드 -->
+  <div class="w-full max-w-md bg-white rounded-xl shadow-lg p-6 space-y-4">
+    <h1 class="text-xl font-bold text-purple-700 text-center">AI Q&A Assistant</h1>
+    
+    <textarea id="question" placeholder="Ask me anything..." 
+      class="w-full border rounded p-3 text-sm resize-none h-28 focus:outline-none focus:ring-2 focus:ring-purple-400"></textarea>
+
+    <button id="askBtn" 
+      class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 rounded">
+      Ask GPT
+    </button>
+
+    <div id="loading" class="text-center text-sm text-gray-500 hidden">Thinking...</div>
+
+    <div id="answerBox" class="bg-gray-100 p-3 rounded text-sm hidden">
+      <strong class="text-purple-700">Answer:</strong>
+      <p id="answerText" class="mt-1"></p>
+    </div>
+
+    <a href="index.html" class="block text-center text-sm text-gray-500 mt-4 hover:underline">🔙 Back</a>
+  </div>
+
+  <script>
+    const askBtn = document.getElementById('askBtn');
+    const questionInput = document.getElementById('question');
+    const answerBox = document.getElementById('answerBox');
+    const answerText = document.getElementById('answerText');
+    const loading = document.getElementById('loading');
+
+    askBtn.addEventListener('click', async () => {
+      const question = questionInput.value.trim();
+      if (!question) return alert('Please enter a question.');
+
+      loading.classList.remove('hidden');
+      answerBox.classList.add('hidden');
+
+      try {
+        const res = await fetch("https://api.openai.com/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "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" // ⛔ API 키 반드시 수정
+          },
+          body: JSON.stringify({
+            model: "gpt-3.5-turbo",
+            messages: [
+              { role: "system", content: "답변을 50자 이내로 간단히 요약해 주세요." },
+              { role: "user", content: question }
+            ],
+            max_tokens: 100,
+            temperature: 0.7
+          })
+        });
+
+        const data = await res.json();
+        const reply = data.choices?.[0]?.message?.content || "No answer.";
+        answerText.textContent = reply;
+        answerBox.classList.remove('hidden');
+      } catch (err) {
+        alert("API 오류: " + err.message);
+      } finally {
+        loading.classList.add('hidden');
+      }
+    });
+  </script>
+</body>
+</html>
