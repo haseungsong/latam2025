@@ -16,36 +16,34 @@
 </head>
 <body class="bg-gray-50 min-h-screen flex flex-col items-center justify-center p-4">
 
-  <!-- ✅ 모달 바로 표시 -->
-  <div id="exchangeModal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg p-6 w-full max-w-md shadow-xl space-y-4">
-      <h2 class="text-xl font-bold text-center">Currency Converter</h2>
+  <!-- ✅ 환율 계산기 박스 -->
+  <div class="bg-white rounded-lg p-6 w-full max-w-md shadow-xl space-y-4 z-50">
+    <h2 class="text-xl font-bold text-center">Currency Converter</h2>
 
-      <!-- 🔹 환율 입력 -->
-      <div class="flex items-center justify-between gap-2 text-sm">
-        <label for="krwInput" class="font-semibold">KRW</label>
-        <input id="krwInput" type="number" class="border rounded px-2 py-1 w-1/2 text-right" />
-        <span>=</span>
-        <span id="usdOutput" class="font-semibold text-blue-700">-</span>
-      </div>
-
-      <!-- 🔹 국가별 환산 표 -->
-      <table class="w-full text-sm border-t mt-4">
-        <thead>
-          <tr class="text-left">
-            <th class="py-2">Country</th>
-            <th>Rate (USD/Local)</th>
-            <th>Converted</th>
-          </tr>
-        </thead>
-        <tbody id="rateTable" class="divide-y"></tbody>
-      </table>
-
-      <button id="closeModalBtn" class="mt-4 w-full bg-gray-300 py-2 rounded hover:bg-gray-400 text-sm">Close</button>
+    <!-- 🔹 환율 입력 -->
+    <div class="flex items-center justify-between gap-2 text-sm">
+      <label for="krwInput" class="font-semibold">KRW</label>
+      <input id="krwInput" type="text" inputmode="numeric"
+             class="border rounded px-2 py-1 w-1/2 text-right" />
+      <span>=</span>
+      <span id="usdOutput" class="font-semibold text-blue-700">-</span>
     </div>
+
+    <!-- 🔹 국가별 환산 표 -->
+    <table class="w-full text-sm border-t mt-4">
+      <thead>
+        <tr class="text-left">
+          <th class="py-2">Country</th>
+          <th>Rate (USD/Local)</th>
+          <th>Converted</th>
+        </tr>
+      </thead>
+      <tbody id="rateTable" class="divide-y"></tbody>
+    </table>
+
+    <a href="index.html" class="mt-4 w-full block bg-gray-300 py-2 rounded text-center hover:bg-gray-400 text-sm">Back</a>
   </div>
 
-  <!-- ✅ 스크립트 -->
   <script>
     const exchangeRates = [
       { country: 'Brazil', code: 'BRL', flag: 'https://flagcdn.com/br.svg', rate: 5.6 },
@@ -57,12 +55,10 @@
       { country: 'Peru', code: 'PEN', flag: 'https://flagcdn.com/pe.svg', rate: 3.7 }
     ];
 
-    let usdToKrw = 1400; // 기본값
+    let usdToKrw = 1400;
     const krwInput = document.getElementById('krwInput');
     const usdOutput = document.getElementById('usdOutput');
     const rateTable = document.getElementById('rateTable');
-    const closeModalBtn = document.getElementById('closeModalBtn');
-    const modal = document.getElementById('exchangeModal');
 
     async function fetchUsdKrwRate() {
       const yesterday = new Date();
@@ -73,18 +69,26 @@
         const res = await fetch(`https://api.exchangerate.host/${dateStr}?base=USD&symbols=KRW`);
         const data = await res.json();
         usdToKrw = data.rates.KRW;
-        krwInput.value = Math.round(usdToKrw);
+        krwInput.value = formatNumber(Math.round(usdToKrw));
       } catch (err) {
-        krwInput.value = usdToKrw;
+        krwInput.value = formatNumber(usdToKrw);
       }
 
       updateRates();
     }
 
+    function formatNumber(num) {
+      return num.toLocaleString('en-US');
+    }
+
+    function parseNumber(str) {
+      return parseFloat(str.replace(/,/g, '')) || 0;
+    }
+
     function updateRates() {
-      const krw = parseFloat(krwInput.value) || 0;
+      const krw = parseNumber(krwInput.value);
       const usd = krw / usdToKrw;
-      usdOutput.textContent = `${usd.toFixed(2)} USD`;
+      usdOutput.textContent = `${usd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD`;
 
       rateTable.innerHTML = '';
       exchangeRates.forEach(item => {
@@ -101,13 +105,16 @@
       });
     }
 
-    krwInput.addEventListener('input', updateRates);
-    closeModalBtn.addEventListener('click', () => {
-      modal.classList.add('hidden');
+    krwInput.addEventListener('input', (e) => {
+      const raw = parseNumber(e.target.value);
+      e.target.value = formatNumber(raw);
+      updateRates();
     });
 
-    // 페이지 로드시 바로 실행
-    fetchUsdKrwRate();
+    window.addEventListener('DOMContentLoaded', () => {
+      fetchUsdKrwRate();
+      krwInput.focus();
+    });
   </script>
 </body>
 </html>
