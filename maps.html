@@ -7,7 +7,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     #map {
-      height: 80vh;
+      height: 70vh;
       width: 100%;
     }
   </style>
@@ -15,6 +15,7 @@
 <body class="bg-gray-100 p-4">
   <h1 class="text-xl font-bold mb-4 text-center">📍 목적지 선택</h1>
 
+  <!-- 목적지 버튼 -->
   <div class="grid grid-cols-2 gap-4 mb-4 max-w-md mx-auto">
     <button onclick="routeTo('museu')" class="bg-white py-2 px-4 rounded shadow hover:bg-gray-200">🏛️ Museu do Ipiranga</button>
     <button onclick="routeTo('paulista')" class="bg-white py-2 px-4 rounded shadow hover:bg-gray-200">🏙️ Av. Paulista</button>
@@ -22,17 +23,22 @@
     <button onclick="routeTo('mercado')" class="bg-white py-2 px-4 rounded shadow hover:bg-gray-200">🛍️ Mercado Municipal</button>
   </div>
 
-  <div id="map"></div>
+  <!-- 거리, 시간 안내 -->
+  <div id="routeInfo" class="text-center text-sm text-gray-700 mt-2 mb-4 whitespace-pre-line"></div>
+
+  <!-- 지도 -->
+  <div id="map" class="rounded shadow"></div>
 
   <script>
     const destinations = {
-      museu: { lat: -23.5854, lng: -46.6237 },         // Museu do Ipiranga
-      paulista: { lat: -23.5614, lng: -46.6559 },      // Av. Paulista
-      ibirapuera: { lat: -23.5874, lng: -46.6576 },    // Parque Ibirapuera
-      mercado: { lat: -23.5411, lng: -46.6275 }        // Mercado Municipal
+      museu: { lat: -23.5854, lng: -46.6237 },
+      paulista: { lat: -23.5614, lng: -46.6559 },
+      ibirapuera: { lat: -23.5874, lng: -46.6576 },
+      mercado: { lat: -23.5411, lng: -46.6275 }
     };
 
     let map, directionsService, directionsRenderer;
+    const routeInfoDiv = document.getElementById("routeInfo");
 
     function initMap() {
       map = new google.maps.Map(document.getElementById("map"), {
@@ -55,27 +61,38 @@
             lng: position.coords.longitude
           };
 
+          // 🔄 이전 경로 제거하고 새로 세팅
+          directionsRenderer.setMap(null);
+          directionsRenderer = new google.maps.DirectionsRenderer();
+          directionsRenderer.setMap(map);
+
           directionsService.route(
             {
               origin: origin,
               destination: destination,
-              travelMode: google.maps.TravelMode.DRIVING,
+              travelMode: google.maps.TravelMode.WALKING,
             },
             (response, status) => {
               if (status === "OK") {
                 directionsRenderer.setDirections(response);
+                const leg = response.routes[0].legs[0];
+                routeInfoDiv.innerText = `🚶 ${leg.start_address} → ${leg.end_address}\n⏱️ ${leg.duration.text} (${leg.distance.text})`;
               } else {
                 alert("경로를 찾을 수 없습니다: " + status);
+                routeInfoDiv.innerText = "";
               }
             }
           );
         },
-        () => alert("현재 위치를 가져올 수 없습니다.")
+        () => {
+          alert("현재 위치를 가져올 수 없습니다.");
+          routeInfoDiv.innerText = "";
+        }
       );
     }
   </script>
 
-  <!-- ✅ Google Maps JS API (API 키 필수) -->
+  <!-- ✅ Google Maps API Key 넣기 -->
   <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAfHkgQ8w0T0-JlGESZiLbFAAgULg46I4A&callback=initMap">
   </script>
