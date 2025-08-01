@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SOS 전송</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-red-50 min-h-screen flex items-center justify-center p-6">
+
+  <div class="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full space-y-4 text-center">
+    <h1 class="text-2xl font-bold text-red-600">🆘 긴급 메시지</h1>
+    <p class="text-gray-700">아래에 상황을 간단히 작성한 뒤 전송하면 현재 위치와 함께 WhatsApp으로 전송됩니다.</p>
+    
+    <textarea id="messageInput" rows="4" placeholder="메시지를 입력하세요..." class="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-red-400"></textarea>
+    
+    <button id="sendBtn" class="w-full bg-red-600 text-white font-semibold py-3 rounded hover:bg-red-700 transition">
+      📤 WhatsApp으로 전송
+    </button>
+  </div>
+
+  <script>
+    document.getElementById('sendBtn').addEventListener('click', () => {
+      const message = document.getElementById('messageInput').value.trim();
+
+      if (!message) {
+        alert("메시지를 입력해 주세요.");
+        return;
+      }
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition((position) => {
+          const lat = position.coords.latitude;
+          const lon = position.coords.longitude;
+          const locationLink = `https://www.google.com/maps?q=${lat},${lon}`;
+          const fullMessage = `${message}\n\n📍 내 위치: ${locationLink}`;
+
+          // ✅ 수신자 번호 (브라질 번호): 55 + 11 + 98145-1081
+          const phoneNumber = "5511981451081";
+          const whatsappURL = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(fullMessage)}`;
+
+          // WhatsApp으로 이동
+          window.location.href = whatsappURL;
+
+        }, () => {
+          alert("위치를 가져오지 못했습니다. 위치 권한을 허용해주세요.");
+        });
+      } else {
+        alert("이 기기에서 위치 정보를 사용할 수 없습니다.");
+      }
+    });
+  </script>
+
+</body>
+</html>
