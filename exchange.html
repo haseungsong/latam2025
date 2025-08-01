@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Currency Exchange</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .flag {
+      width: 24px;
+      height: 16px;
+      object-fit: cover;
+      border-radius: 2px;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col items-center justify-center p-4">
+
+  <!-- ✅ 상단 환율 배너 -->
+  <div class="mb-6">
+    <button id="openModalBtn" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-lg shadow hover:bg-blue-700">
+      Loading...
+    </button>
+  </div>
+
+  <!-- ✅ 모달 -->
+  <div id="exchangeModal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center hidden z-50">
+    <div class="bg-white rounded-lg p-6 w-full max-w-md shadow-xl space-y-4">
+      <h2 class="text-xl font-bold text-center">Currency Converter</h2>
+
+      <!-- 🔹 환율 입력 영역 -->
+      <div class="flex items-center justify-between gap-2 text-sm">
+        <label for="krwInput" class="font-semibold">KRW</label>
+        <input id="krwInput" type="number" class="border rounded px-2 py-1 w-1/2 text-right">
+        <span>=</span>
+        <span id="usdOutput" class="font-semibold text-blue-700">-</span>
+      </div>
+
+      <!-- 🔹 환산 테이블 -->
+      <table class="w-full text-sm border-t mt-4">
+        <thead>
+          <tr class="text-left">
+            <th class="py-2">Country</th>
+            <th>Rate (USD/Local)</th>
+            <th>Converted</th>
+          </tr>
+        </thead>
+        <tbody id="rateTable" class="divide-y"></tbody>
+      </table>
+
+      <button id="closeModalBtn" class="mt-4 w-full bg-gray-300 py-2 rounded hover:bg-gray-400 text-sm">Close</button>
+    </div>
+  </div>
+
+  <!-- ✅ JS -->
+  <script>
+    const exchangeRates = [
+      { country: 'Brazil', code: 'BRL', flag: 'https://flagcdn.com/br.svg', rate: 5.6 },
+      { country: 'Mexico', code: 'MXN', flag: 'https://flagcdn.com/mx.svg', rate: 17.2 },
+      { country: 'Panama', code: 'PAB', flag: 'https://flagcdn.com/pa.svg', rate: 1.0 },
+      { country: 'Chile', code: 'CLP', flag: 'https://flagcdn.com/cl.svg', rate: 925 },
+      { country: 'Colombia', code: 'COP', flag: 'https://flagcdn.com/co.svg', rate: 4000 },
+      { country: 'Argentina', code: 'ARS', flag: 'https://flagcdn.com/ar.svg', rate: 900 },
+      { country: 'Peru', code: 'PEN', flag: 'https://flagcdn.com/pe.svg', rate: 3.7 }
+    ];
+
+    let usdToKrw = 1400; // 기본값 (API 실패 시 대비)
+    const krwInput = document.getElementById('krwInput');
+    const usdOutput = document.getElementById('usdOutput');
+    const rateTable = document.getElementById('rateTable');
+    const openModalBtn = document.getElementById('openModalBtn');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const modal = document.getElementById('exchangeModal');
+
+    // ✅ 전날 기준 환율 불러오기
+    async function fetchUsdKrwRate() {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const dateStr = yesterday.toISOString().split("T")[0];
+
+      try {
+        const res = await fetch(`https://api.exchangerate.host/${dateStr}?base=USD&symbols=KRW`);
+        const data = await res.json();
+        usdToKrw = data.rates.KRW;
+        openModalBtn.textContent = `1 USD = ${Math.round(usdToKrw)} KRW`;
+        krwInput.value = Math.round(usdToKrw);
+      } catch (err) {
+        openModalBtn.textContent = `1 USD = ${usdToKrw} KRW (default)`;
+        krwInput.value = usdToKrw;
+      }
+    }
+
+    function updateRates() {
+      const krw = parseFloat(krwInput.value) || 0;
+      const usd = krw / usdToKrw;
+      usdOutput.textContent = `${usd.toFixed(2)} USD`;
+
+      rateTable.innerHTML = '';
+      exchangeRates.forEach(item => {
+        const converted = usd * item.rate;
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td class="py-2 flex items-center gap-2">
+            <img src="${item.flag}" alt="${item.country}" class="flag"> ${item.country}
+          </td>
+          <td>${item.rate.toLocaleString()} ${item.code}</td>
+          <td class="font-semibold">${converted.toLocaleString(undefined, { maximumFractionDigits: 2 })} ${item.code}</td>
+        `;
+        rateTable.appendChild(row);
+      });
+    }
+
+    openModalBtn.addEventListener('click', () => {
+      modal.classList.remove('hidden');
+      updateRates();
+    });
+
+    closeModalBtn.addEventListener('click', () => {
+      modal.classList.add('hidden');
+    });
+
+    krwInput.addEventListener('input', updateRates);
+
+    // 페이지 로드시 실행
+    fetchUsdKrwRate();
+  </script>
+
+</body>
+</html>
