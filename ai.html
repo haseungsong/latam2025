@@ -45,29 +45,20 @@
       answerBox.classList.add('hidden');
 
       try {
-        const res = await fetch("https://api.openai.com/v1/chat/completions", {
+        const res = await fetch("https://askgpt-7nyb2zk2hqeuc.a.run.app", {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
-            "Authorization": "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" // ⛔ API 키 반드시 수정
+            "Content-Type": "application/json"
           },
-          body: JSON.stringify({
-            model: "gpt-3.5-turbo",
-            messages: [
-              { role: "system", content: "답변을 50자 이내로 간단히 요약해 주세요." },
-              { role: "user", content: question }
-            ],
-            max_tokens: 100,
-            temperature: 0.7
-          })
+          body: JSON.stringify({ prompt: question })
         });
 
         const data = await res.json();
-        const reply = data.choices?.[0]?.message?.content || "No answer.";
+        const reply = data.answer || "No answer.";
         answerText.textContent = reply;
         answerBox.classList.remove('hidden');
       } catch (err) {
-        alert("API 오류: " + err.message);
+        alert("🔥 Firebase Function 오류: " + err.message);
       } finally {
         loading.classList.add('hidden');
       }
@@ -75,4 +66,3 @@
   </script>
 </body>
 </html>
-
