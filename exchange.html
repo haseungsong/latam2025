@@ -16,27 +16,20 @@
 </head>
 <body class="bg-gray-50 min-h-screen flex flex-col items-center justify-center p-4">
 
-  <!-- ✅ 상단 환율 배너 -->
-  <div class="mb-6">
-    <button id="openModalBtn" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-lg shadow hover:bg-blue-700">
-      Loading...
-    </button>
-  </div>
-
-  <!-- ✅ 모달 -->
-  <div id="exchangeModal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center hidden z-50">
+  <!-- ✅ 모달 바로 표시 -->
+  <div id="exchangeModal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
     <div class="bg-white rounded-lg p-6 w-full max-w-md shadow-xl space-y-4">
       <h2 class="text-xl font-bold text-center">Currency Converter</h2>
 
-      <!-- 🔹 환율 입력 영역 -->
+      <!-- 🔹 환율 입력 -->
       <div class="flex items-center justify-between gap-2 text-sm">
         <label for="krwInput" class="font-semibold">KRW</label>
-        <input id="krwInput" type="number" class="border rounded px-2 py-1 w-1/2 text-right">
+        <input id="krwInput" type="number" class="border rounded px-2 py-1 w-1/2 text-right" />
         <span>=</span>
         <span id="usdOutput" class="font-semibold text-blue-700">-</span>
       </div>
 
-      <!-- 🔹 환산 테이블 -->
+      <!-- 🔹 국가별 환산 표 -->
       <table class="w-full text-sm border-t mt-4">
         <thead>
           <tr class="text-left">
@@ -52,7 +45,7 @@
     </div>
   </div>
 
-  <!-- ✅ JS -->
+  <!-- ✅ 스크립트 -->
   <script>
     const exchangeRates = [
       { country: 'Brazil', code: 'BRL', flag: 'https://flagcdn.com/br.svg', rate: 5.6 },
@@ -64,15 +57,13 @@
       { country: 'Peru', code: 'PEN', flag: 'https://flagcdn.com/pe.svg', rate: 3.7 }
     ];
 
-    let usdToKrw = 1400; // 기본값 (API 실패 시 대비)
+    let usdToKrw = 1400; // 기본값
     const krwInput = document.getElementById('krwInput');
     const usdOutput = document.getElementById('usdOutput');
     const rateTable = document.getElementById('rateTable');
-    const openModalBtn = document.getElementById('openModalBtn');
     const closeModalBtn = document.getElementById('closeModalBtn');
     const modal = document.getElementById('exchangeModal');
 
-    // ✅ 전날 기준 환율 불러오기
     async function fetchUsdKrwRate() {
       const yesterday = new Date();
       yesterday.setDate(yesterday.getDate() - 1);
@@ -82,12 +73,12 @@
         const res = await fetch(`https://api.exchangerate.host/${dateStr}?base=USD&symbols=KRW`);
         const data = await res.json();
         usdToKrw = data.rates.KRW;
-        openModalBtn.textContent = `1 USD = ${Math.round(usdToKrw)} KRW`;
         krwInput.value = Math.round(usdToKrw);
       } catch (err) {
-        openModalBtn.textContent = `1 USD = ${usdToKrw} KRW (default)`;
         krwInput.value = usdToKrw;
       }
+
+      updateRates();
     }
 
     function updateRates() {
@@ -110,20 +101,13 @@
       });
     }
 
-    openModalBtn.addEventListener('click', () => {
-      modal.classList.remove('hidden');
-      updateRates();
-    });
-
+    krwInput.addEventListener('input', updateRates);
     closeModalBtn.addEventListener('click', () => {
       modal.classList.add('hidden');
     });
 
-    krwInput.addEventListener('input', updateRates);
-
-    // 페이지 로드시 실행
+    // 페이지 로드시 바로 실행
     fetchUsdKrwRate();
   </script>
-
 </body>
 </html>
