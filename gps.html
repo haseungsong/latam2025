@@ -35,6 +35,11 @@
     <button id="sendBtn" class="w-full bg-red-600 text-white font-semibold py-3 rounded hover:bg-red-700 transition">
       📤 Send via WhatsApp
     </button>
+
+    <!-- ✅ 🔙 뒤로가기 버튼 -->
+    <button onclick="goBack()" class="w-full bg-gray-300 text-gray-800 font-semibold py-2 rounded hover:bg-gray-400">
+      🔙 Back
+    </button>
   </div>
 
   <script>
@@ -71,6 +76,15 @@
     // ✅ 버튼 클릭 시 즉시 전송
     function sendQuickMessage(text) {
       sendWhatsApp(text);
+    }
+
+    // ✅ 뒤로가기 기능
+    function goBack() {
+      if (window.history.length > 1) {
+        window.history.back(); // 이전 히스토리로 이동
+      } else {
+        window.location.href = 'index.html'; // 없으면 홈으로 이동
+      }
     }
   </script>
 
