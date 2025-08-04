@@ -13,7 +13,11 @@
   </style>
 </head>
 <body class="bg-gray-100 p-4">
-  <h1 class="text-xl font-bold mb-4 text-center">📍 목적지 선택</h1>
+  <!-- 🔙 상단 뒤로가기 + 제목 -->
+  <div class="flex items-center justify-between max-w-md mx-auto mb-4">
+    <button onclick="goHome()" class="text-sm text-blue-600 hover:underline">← Back</button>
+    <h1 class="text-xl font-bold text-center flex-1 -ml-6">📍 목적지 선택</h1>
+  </div>
 
   <!-- 목적지 버튼 -->
   <div class="grid grid-cols-2 gap-4 mb-4 max-w-md mx-auto">
@@ -96,5 +100,12 @@
   <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAfHkgQ8w0T0-JlGESZiLbFAAgULg46I4A&callback=initMap">
   </script>
+
+  <script>
+    function goHome() {
+      window.location.href = "index.html"; // 원하는 홈 경로로 수정 가능
+    }
+  </script>
+
 </body>
 </html>
