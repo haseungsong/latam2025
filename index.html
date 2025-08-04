@@ -51,13 +51,13 @@
 
             <!-- 영어 -->
             <div class="swiper-slide" data-lang="en">
-              <img src="assets/program_en_1.jpg" class="w-full rounded" />
+              <img src="assets/program_en_1.jpg" loading="lazy" class="w-full rounded" />
             </div>
             <div class="swiper-slide" data-lang="en">
-              <img src="assets/program_en_2.jpg" class="w-full rounded" />
+              <img src="assets/program_en_2.jpg" loading="lazy" class="w-full rounded" />
             </div>
             <div class="swiper-slide" data-lang="en">
-              <img src="assets/program_en_3.jpg" class="w-full rounded" />
+              <img src="assets/program_en_3.jpg" loading="lazy" class="w-full rounded" />
             </div>
 
             <!-- 포르투갈어 -->
@@ -188,6 +188,9 @@
   const closeBtn = document.getElementById("closeModalBtn");
   const langSelect = document.getElementById("langSelect");
   const floatingButtons = document.getElementById("floatingButtons");
+  // 슬라이드 원본 백업
+  const allSlideTemplates = Array.from(document.querySelectorAll(".swiper-slide")).map(slide => slide.cloneNode(true));
+
 
 
   const swiper = new Swiper(".mySwiper", {
@@ -202,20 +205,29 @@
   });
 
   function showSlidesByLang(lang) {
-    const allSlides = document.querySelectorAll(".swiper-slide");
-    allSlides.forEach(slide => {
-      const slideLang = slide.getAttribute("data-lang");
-      slide.classList.toggle("hidden", slideLang !== lang);
-    });
+    const wrapper = document.querySelector(".swiper-wrapper");
+    
+    // 기존 슬라이드 제거
+    wrapper.innerHTML = '';
+
+    // 백업해둔 슬라이드들 중에서 언어 필터링 후 복제 삽입
+    allSlideTemplates
+      .filter(slide => slide.getAttribute("data-lang") === lang)
+      .forEach(slide => wrapper.appendChild(slide.cloneNode(true)));
+
     swiper.update();
   }
 
   openBtn.addEventListener("click", () => {
     modal.classList.remove("hidden");
-    floatingButtons.classList.add("hidden");  // 👈 하단 버튼 숨기기
+    document.getElementById("floatingButtons").classList.add("hidden");
 
+    // 이전 선택 언어 불러오기
+    const savedLang = localStorage.getItem("preferredLang");
     const browserLang = navigator.language.slice(0, 2);
-    const defaultLang = ['en', 'pt', 'es'].includes(browserLang) ? browserLang : 'en';
+    const defaultLang = ['en', 'pt', 'es'].includes(savedLang) ? savedLang :
+                        ['en', 'pt', 'es'].includes(browserLang) ? browserLang : 'en';
+
     langSelect.value = defaultLang;
     showSlidesByLang(defaultLang);
   });
@@ -233,7 +245,9 @@
   });
 
   langSelect.addEventListener("change", (e) => {
-    showSlidesByLang(e.target.value);
+    const selectedLang = e.target.value;
+    localStorage.setItem("preferredLang", selectedLang); // 저장
+    showSlidesByLang(selectedLang);
   });
 </script>
   
