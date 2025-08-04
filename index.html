@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Conference Program</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 👇 여기에 추가 (tailwind 밑에) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
 </head>
 <body class="bg-gray-100 min-h-screen relative p-4">
 
@@ -20,12 +23,55 @@
   <!-- ✅ 메인 박스 패딩 조정 -->
   <div id="mainContainer" class="w-full max-w-sm bg-white pt-6 pb-2 px-6 rounded-xl shadow text-center mx-auto space-y-4">
 
-    <!-- 🔹 Full Program Button -->
-    <div class="mb-2">
-      <button id="fullProgramBtn" class="w-full py-3 bg-yellow-200 text-yellow-800 font-semibold rounded hover:bg-yellow-300">
-        📅 View Full Program
-      </button>
+    <!-- ✅ Full Program Modal (View Full Program 클릭 시 열림) -->
+    <div id="programModal" class="fixed inset-0 z-50 bg-black bg-opacity-60 hidden flex items-center justify-center">
+      <div class="bg-white w-11/12 max-w-md rounded-lg p-4 relative">
+        <button id="closeModalBtn" class="absolute top-2 right-3 text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
+        <h2 class="text-lg font-semibold mb-3">📅 Full Program</h2>
+
+        <!-- 언어 선택 -->
+        <div class="mb-4">
+          <label for="langSelect" class="text-sm font-medium">Select Language:</label>
+          <select id="langSelect" class="w-full border rounded p-2 mt-1">
+            <option value="en">English</option>
+            <option value="pt">Português</option>
+            <option value="es">Español</option>
+          </select>
+        </div>
+
+        <!-- Swiper 슬라이더 -->
+        <div class="swiper mySwiper">
+          <div class="swiper-wrapper">
+
+            <!-- 영어 -->
+            <div class="swiper-slide" data-lang="en">
+              <img src="assets/program_en_1.jpg" class="w-full rounded" />
+            </div>
+            <div class="swiper-slide" data-lang="en">
+              <img src="assets/program_en_2.jpg" class="w-full rounded" />
+            </div>
+
+            <!-- 포르투갈어 -->
+            <div class="swiper-slide hidden" data-lang="pt">
+              <img src="assets/program_pt_1.jpg" class="w-full rounded" />
+            </div>
+            <div class="swiper-slide hidden" data-lang="pt">
+              <img src="assets/program_pt_2.jpg" class="w-full rounded" />
+            </div>
+
+            <!-- 스페인어 -->
+            <div class="swiper-slide hidden" data-lang="es">
+              <img src="assets/program_es_1.jpg" class="w-full rounded" />
+            </div>
+            <div class="swiper-slide hidden" data-lang="es">
+              <img src="assets/program_es_2.jpg" class="w-full rounded" />
+            </div>
+          </div>
+          <div class="swiper-pagination mt-3"></div>
+        </div>
+      </div>
     </div>
+
 
     <!-- Title -->
     <h1 class="text-2xl font-bold">LATAM Conference 2025</h1>
@@ -84,13 +130,56 @@
       day2Submenu.classList.remove('hidden');
       subtitle.innerText = 'Day 2 Program';
     });
-
-    document.getElementById('fullProgramBtn').addEventListener('click', () => {
-      alert("Full program coming soon!");
-    });
+   
   </script>
 
+  <!-- ✅ Swiper JS -->
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
+<script>
+  const modal = document.getElementById("programModal");
+  const openBtn = document.getElementById("fullProgramBtn");
+  const closeBtn = document.getElementById("closeModalBtn");
+  const langSelect = document.getElementById("langSelect");
+
+  const swiper = new Swiper(".mySwiper", {
+    slidesPerView: 1.1,
+    spaceBetween: 10,
+    centeredSlides: true,
+    loop: true,
+    pagination: {
+      el: ".swiper-pagination",
+      clickable: true,
+    },
+  });
+
+  function showSlidesByLang(lang) {
+    const allSlides = document.querySelectorAll(".swiper-slide");
+    allSlides.forEach(slide => {
+      const slideLang = slide.getAttribute("data-lang");
+      slide.classList.toggle("hidden", slideLang !== lang);
+    });
+    swiper.update();
+  }
+
+  openBtn.addEventListener("click", () => {
+    modal.classList.remove("hidden");
+    const browserLang = navigator.language.slice(0, 2);
+    const defaultLang = ['en', 'pt', 'es'].includes(browserLang) ? browserLang : 'en';
+    langSelect.value = defaultLang;
+    showSlidesByLang(defaultLang);
+  });
+
+  closeBtn.addEventListener("click", () => modal.classList.add("hidden"));
+
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) modal.classList.add("hidden");
+  });
+
+  langSelect.addEventListener("change", (e) => {
+    showSlidesByLang(e.target.value);
+  });
+</script>
 
   <!-- ✅ 고정 하단 버튼 그룹 (환율 + SOS) -->
   <div class="fixed bottom-6 right-6 flex gap-4 z-50">
@@ -100,7 +189,7 @@
       class="w-16 h-16 bg-purple-600 rounded-full shadow-lg flex items-center justify-center text-white text-xs font-bold hover:bg-purple-700 text-center leading-tight">
       AI
     </a>
-    
+
      <!-- 📍 지도 버튼 -->
     <a href="maps.html"
       class="w-16 h-16 bg-yellow-400 rounded-full shadow-lg flex items-center justify-center text-white text-xs font-bold hover:bg-yellow-500 text-center leading-tight">
@@ -128,5 +217,3 @@
 </body>
 
 </html>
-
-
