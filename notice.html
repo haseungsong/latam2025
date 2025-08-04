@@ -30,6 +30,12 @@
     </ul>
   </div>
 
+  <!-- 🔙 인덱스로 돌아가기 버튼 -->
+  <button onclick="goHome()" class="w-full mt-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400">
+    🔙 Back to Main
+  </button>
+
+
   <!-- 📄 공지 상세 모달 -->
   <div id="noticeDetailModal" class="hidden bg-white w-full max-w-md rounded-lg shadow-lg p-4 space-y-4">
     <button onclick="goBack()" class="text-sm text-blue-600 hover:underline">← Back</button>
@@ -37,6 +43,8 @@
     <p id="noticeDate" class="text-xs text-gray-500"></p>
     <div id="noticeContent" class="text-gray-700 whitespace-pre-line mt-2"></div>
   </div>
+
+  
 
   <!-- ✅ JS -->
   <script>
@@ -71,6 +79,12 @@
     function goBack() {
       detailModal.classList.add("hidden");
       listModal.classList.remove("hidden");
+    }
+  </script>
+
+  <script>
+    function goHome() {
+      window.location.href = 'index.html';
     }
   </script>
 
