@@ -150,6 +150,8 @@
   const openBtn = document.getElementById("fullProgramBtn");
   const closeBtn = document.getElementById("closeModalBtn");
   const langSelect = document.getElementById("langSelect");
+  const floatingButtons = document.getElementById("floatingButtons");
+
 
   const swiper = new Swiper(".mySwiper", {
     slidesPerView: 1.1,
@@ -173,16 +175,24 @@
 
   openBtn.addEventListener("click", () => {
     modal.classList.remove("hidden");
+    floatingButtons.classList.add("hidden");  // 👈 하단 버튼 숨기기
+
     const browserLang = navigator.language.slice(0, 2);
     const defaultLang = ['en', 'pt', 'es'].includes(browserLang) ? browserLang : 'en';
     langSelect.value = defaultLang;
     showSlidesByLang(defaultLang);
   });
 
-  closeBtn.addEventListener("click", () => modal.classList.add("hidden"));
+  closeBtn.addEventListener("click", () => {
+    modal.classList.add("hidden");
+    floatingButtons.classList.remove("hidden");  // 👈 다시 보이기
+  });
 
   modal.addEventListener("click", (e) => {
-    if (e.target === modal) modal.classList.add("hidden");
+    if (e.target === modal) {
+      modal.classList.add("hidden");
+      floatingButtons.classList.remove("hidden");  // 👈 다시 보이기
+    }
   });
 
   langSelect.addEventListener("change", (e) => {
@@ -191,7 +201,8 @@
 </script>
 
   <!-- ✅ 고정 하단 버튼 그룹 (환율 + SOS) -->
-  <div class="fixed bottom-6 right-6 flex gap-4 z-50">
+  <div id="floatingButtons"
+     class="fixed bottom-6 left-1/2 transform -translate-x-1/2 flex gap-4 z-50">
 
     <!-- 🧠 AI 버튼 (텍스트 크기 ↑) -->
     <a href="ai.html"
