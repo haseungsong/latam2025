@@ -163,23 +163,34 @@
   });
 
   function showSlidesByLang(lang) {
-    const allSlides = document.querySelectorAll(".swiper-slide");
-    allSlides.forEach(slide => {
-      const slideLang = slide.getAttribute("data-lang");
-      slide.classList.toggle("hidden", slideLang !== lang);
-    });
+    const wrapper = document.querySelector(".swiper-wrapper");
+    const allSlides = Array.from(document.querySelectorAll(".swiper-slide"));
+
+    // 기존 모든 슬라이드 제거
+    wrapper.innerHTML = '';
+
+    // 선택 언어 슬라이드만 재삽입
+    allSlides
+      .filter(slide => slide.getAttribute("data-lang") === lang)
+      .forEach(slide => wrapper.appendChild(slide));
+
     swiper.update();
   }
 
   openBtn.addEventListener("click", () => {
     modal.classList.remove("hidden");
+    document.getElementById("floatingButtons").classList.add("hidden");
+
     const browserLang = navigator.language.slice(0, 2);
     const defaultLang = ['en', 'pt', 'es'].includes(browserLang) ? browserLang : 'en';
     langSelect.value = defaultLang;
     showSlidesByLang(defaultLang);
   });
 
-  closeBtn.addEventListener("click", () => modal.classList.add("hidden"));
+  closeBtn.addEventListener("click", () => {
+    modal.classList.add("hidden");
+    document.getElementById("floatingButtons").classList.remove("hidden");
+  });
 
   modal.addEventListener("click", (e) => {
     if (e.target === modal) modal.classList.add("hidden");
@@ -191,7 +202,7 @@
 </script>
 
   <!-- ✅ 고정 하단 버튼 그룹 (환율 + SOS) -->
-  <div class="fixed bottom-6 right-6 flex gap-4 z-50">
+  <div id="floatingButtons" class="fixed bottom-6 right-6 flex gap-4 z-50">
 
     <!-- 🧠 AI 버튼 -->
     <a href="ai.html"
