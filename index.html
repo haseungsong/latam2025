@@ -98,6 +98,12 @@
       <button id="kwaveBtn" class="w-full py-3 bg-blue-100 text-blue-700 font-semibold rounded hover:bg-blue-200">
         K-Wave (K-Medical)
       </button>
+
+      <!-- 🔹 신규 버튼: K-Wave (Biz. Insight) -->
+      <button id="kwaveBizBtn" class="w-full py-3 bg-blue-100 text-blue-700 font-semibold rounded hover:bg-blue-200">
+        K-Wave (Biz. Insight)
+      </button>
+
       <button id="backBtnFromDay2" class="w-full py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400">🔙 Back</button>
     </div>
 
@@ -129,9 +135,16 @@
       subtitle.innerText = 'Please select a day';
     });
 
-    // ✅ 변경 후 코드 (sasang.html로 이동)
+    // ✅ K-Wave (K-Medical) → sasang.html
     document.getElementById('kwaveBtn').addEventListener('click', () => {
       window.location.href = 'sasang.html';
+    });
+
+    // ✅ K-Wave (Biz. Insight) → program_cohort.html (원하면 링크 변경 가능)
+    document.getElementById('kwaveBizBtn').addEventListener('click', () => {
+      // 날짜/그룹 프리셋으로 바로 열고 싶으면 쿼리 파라미터 사용 예:
+      // window.location.href = 'program_cohort.html?date=2025-10-16&group=A';
+      window.location.href = 'program_cohort.html';
     });
 
     document.getElementById('backBtnFromKwave').addEventListener('click', () => {
