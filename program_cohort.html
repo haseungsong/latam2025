@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en"><!-- 화면 언어는 영어, 주석은 한글 -->
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Program — Cohort Schedule (Dosan & Bukchon)</title>
+
+  <!-- Tailwind CSS (CDN) : 유틸리티 클래스 기반 스타일링 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Swiper (이미지 좌우 스와이프 슬라이더) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+  <style>
+    /* 칩(날짜) 가로 스크롤 시 스크롤바 숨김 (접근성 영향 없음) */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+
+<body class="bg-slate-50 text-slate-900">
+  <!-- ==========================
+       [상단 고정 헤더]
+       - 왼쪽: 날짜 칩
+       - 오른쪽: 그룹 토글 (Group A / Group B)
+       - 그룹에 따라 날짜별 방문 지역 자동 결정 (도산↔북촌 교차)
+       ========================== -->
+  <header class="sticky top-0 z-50 bg-white/80 backdrop-blur border-b border-slate-200">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex flex-col gap-3 md:flex-row md:items-center md:gap-6">
+      <!-- 날짜 칩 컨테이너 (JS로 버튼이 주입됨) -->
+      <div class="flex items-center gap-2 overflow-x-auto no-scrollbar" id="dateChips" aria-label="Select date"></div>
+
+      <!-- 그룹 토글 -->
+      <div class="md:ml-auto">
+        <div class="inline-flex p-1 rounded-full bg-slate-100 ring-1 ring-slate-200" role="tablist" aria-label="Select cohort">
+          <button class="cohort-btn px-4 py-2 rounded-full text-sm font-medium transition"
+                  data-cohort="A" aria-selected="true">Group A</button>
+          <button class="cohort-btn px-4 py-2 rounded-full text-sm font-medium transition"
+                  data-cohort="B" aria-selected="false">Group B</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 안내 배너: 오늘 그룹별 방문 지역 표시 -->
+  <section class="bg-amber-50 border-b border-amber-200">
+    <div class="max-w-6xl mx-auto px-4 py-3 text-sm" id="banner">
+      <!-- JS가 문구를 주입 -->
+    </div>
+  </section>
+
+  <!-- 본문 컨테이너: 카드(장소 단위)가 동적으로 렌더링됨 -->
+  <main class="max-w-6xl mx-auto px-4 py-6 space-y-8" id="content"></main>
+
+  <footer class="max-w-6xl mx-auto px-4 pb-16 pt-2 text-center text-xs text-slate-500">
+    © 2025 LATAM Business Conference — cohort program demo
+  </footer>
+
+  <!-- ==========================
+       [자바스크립트 로직]
+       - COHORT_PLAN: 날짜별 그룹(A/B) → 방문 지역 자동 매핑
+       - DATA: 날짜/지역별 장소 카드 데이터 (영문 UI 텍스트)
+       - 상태: currentDate, currentCohort (A|B)
+       - 렌더링: 날짜 칩, 배너, 카드(장소명/사진 슬라이더/Why/Experience)
+       - URL 동기화: ?date=YYYY-MM-DD&group=A
+       ========================== -->
+  <script>
+    // ------------------------------------------------------------
+    // 0) 그룹 교차 방문 계획
+    //    - 2025-10-16: Group A = dosan, Group B = bukchon
+    //    - 2025-10-17: Group A = bukchon, Group B = dosan
+    // ------------------------------------------------------------
+    const COHORT_PLAN = {
+      "2025-10-16": { A: "dosan",   B: "bukchon" },
+      "2025-10-17": { A: "bukchon", B: "dosan"   }
+    };
+
+    // ------------------------------------------------------------
+    // 1) DATA: 날짜별(2025-10-16 / 2025-10-17) -> 지역별(dosan/bukchon) -> 장소 목록
+    //    - photos 경로는 예시이며, 실제 이미지 파일로 교체
+    //    - 텍스트는 영어로 노출 (주석은 한글)
+    // ------------------------------------------------------------
+    const DATA = {
+      "2025-10-16": {
+        dosan: [
+          {
+            name: "HAUS DOSAN (Gentle Monster Complex)",
+            photos: [
+              "assets/dosan/haus_dosan_1.jpg",
+              "assets/dosan/haus_dosan_2.jpg",
+              "assets/dosan/haus_dosan_3.jpg",
+              "assets/dosan/haus_dosan_4.jpg"
+            ],
+            why:
+              "A multi-level flagship complex blending retail, art installations, fragrance, and desserts—showcasing ‘experience-first’ retail that drives dwell time and shareability.",
+            experience: [
+              "Observe how art-led installations convert into footfall and social reach.",
+              "Study multi-brand zoning (eyewear/beauty/dessert) for cross-traffic.",
+              "Note queue management and photo-spot choreography around peak hours."
+            ]
+          },
+          {
+            name: "medicube SPACE DOSAN",
+            photos: [
+              "assets/dosan/medicube_1.jpg",
+              "assets/dosan/medicube_2.jpg",
+              "assets/dosan/medicube_3.jpg",
+              "assets/dosan/medicube_4.jpg"
+            ],
+            why:
+              "A flagship built around try-before-you-buy devices and simple skin diagnostics—an ‘evidence + hands-on’ loop that converts curiosity into purchase.",
+            experience: [
+              "Walk the flow: skin check → guided demo → discount/coupon hooks.",
+              "Evaluate staff scripts and zones for reducing friction to trial.",
+              "Benchmark device display safety, hygiene, and refill logistics."
+            ]
+          },
+          {
+            name: "JUUN.J DOSAN Flagship",
+            photos: [
+              "assets/dosan/juunj_1.jpg",
+              "assets/dosan/juunj_2.jpg",
+              "assets/dosan/juunj_3.jpg",
+              "assets/dosan/juunj_4.jpg"
+            ],
+            why:
+              "A black-toned, gallery-like flagship by WGNB—split by gender floors, with an in-store café—showing how spatial identity reinforces brand DNA.",
+            experience: [
+              "Check materials/light usage to visualize ‘dark’ identity elegantly.",
+              "Map 1F (café & womens) / 2F (mens) and cross-selling cues.",
+              "Note photo-permitted angles that boost organic social content."
+            ]
+          }
+        ],
+        bukchon: [
+          {
+            name: "House of SULWHASOO (Bukchon)",
+            photos: [
+              "assets/bukchon/sulwhasoo_1.jpg",
+              "assets/bukchon/sulwhasoo_2.jpg",
+              "assets/bukchon/sulwhasoo_3.jpg",
+              "assets/bukchon/sulwhasoo_4.jpg"
+            ],
+            why:
+              "A rare ‘hanok + yangok’ heritage complex with curated rooms (gallery/craft/embellish) that narrate tradition and modernity through design.",
+            experience: [
+              "Study the room-by-room storyline and how visitors are guided.",
+              "Look for touchpoints where craft/art elevates product storytelling.",
+              "Consider night-time façade lighting as a magnet for walk-ins."
+            ]
+          },
+          {
+            name: "Le Labo Bukchon",
+            photos: [
+              "assets/bukchon/lelabo_1.jpg",
+              "assets/bukchon/lelabo_2.jpg",
+              "assets/bukchon/lelabo_3.jpg",
+              "assets/bukchon/lelabo_4.jpg"
+            ],
+            why:
+              "Korea’s first Le Labo flagship inside a traditional hanok—an intimate sensory ‘lab’ that merges craft with contemporary experience.",
+            experience: [
+              "Observe the lab-style personalization and refill ritual.",
+              "Assess how hanok textures frame modern retail fixtures.",
+              "Track dwell time near the scent bar vs. product shelves."
+            ]
+          },
+          {
+            name: "Pyunkang Yul Flagship (Bukchon)",
+            photos: [
+              "assets/bukchon/pyunkangyul_1.jpg",
+              "assets/bukchon/pyunkangyul_2.jpg",
+              "assets/bukchon/pyunkangyul_3.jpg",
+              "assets/bukchon/pyunkangyul_4.jpg"
+            ],
+            why:
+              "A flagship in Bukchon with museum-like storytelling of the brand’s dermatology roots—clear navigation and ‘guided discovery’ of routines.",
+            experience: [
+              "Follow the narrative: history → ingredients → regimens.",
+              "Check sampling points and conversion prompts to membership.",
+              "Evaluate signage clarity for non-Korean visitors."
+            ]
+          }
+        ]
+      },
+      "2025-10-17": {
+        dosan: [
+          {
+            name: "CASETiFY DOSAN",
+            photos: [
+              "assets/dosan/casetify_1.jpg",
+              "assets/dosan/casetify_2.jpg",
+              "assets/dosan/casetify_3.jpg",
+              "assets/dosan/casetify_4.jpg"
+            ],
+            why:
+              "A personalization-first flagship—custom print zones, Dosan-only collabs, and a café tie-in—turning on-the-spot creation into fan content.",
+            experience: [
+              "Time the custom flow: design → print → pickup; note throughput.",
+              "Review limited drops and local collabs as traffic spikes.",
+              "Check integration of café seating with waiting experience."
+            ]
+          },
+          {
+            name: "Hyundai Motorstudio Seoul (Apgujeong)",
+            photos: [
+              "assets/dosan/hyundai_motorstudio_1.jpg",
+              "assets/dosan/hyundai_motorstudio_2.jpg",
+              "assets/dosan/hyundai_motorstudio_3.jpg",
+              "assets/dosan/hyundai_motorstudio_4.jpg"
+            ],
+            why:
+              "An exhibition-led mobility hub—design showcases like ‘Reflection in Motion’ and hands-on cultural programs that reframe car retail.",
+            experience: [
+              "Map exhibit narrative from concept to prototype to lifestyle.",
+              "Identify ‘participatory’ zones that collect visitor feedback.",
+              "Consider how rotating themes keep repeat visits high."
+            ]
+          },
+          {
+            name: "COEX — Starfield Library",
+            photos: [
+              "assets/dosan/coex_starfield_1.jpg",
+              "assets/dosan/coex_starfield_2.jpg",
+              "assets/dosan/coex_starfield_3.jpg",
+              "assets/dosan/coex_starfield_4.jpg"
+            ],
+            why:
+              "A free, open library in a mall atrium with 13m-high bookshelves—an iconic stop that blends culture, commerce, and content creation.",
+            experience: [
+              "Observe how events/lectures activate weekday traffic.",
+              "Plan photo angles; note queue/flow near central stacks.",
+              "Check operating hours (approx. 10:30–22:00) for scheduling."
+            ]
+          }
+        ],
+        bukchon: [
+          {
+            name: "adidas Bukchon Heritage Store",
+            photos: [
+              "assets/bukchon/adidas_heritage_1.jpg",
+              "assets/bukchon/adidas_heritage_2.jpg",
+              "assets/bukchon/adidas_heritage_3.jpg",
+              "assets/bukchon/adidas_heritage_4.jpg"
+            ],
+            why:
+              "A culture-meets-sport concept in historic Bukchon—featuring Korea-inspired exclusives (e.g., items inspired by traditional mask dance).",
+            experience: [
+              "Track limited items and drop calendars for line management.",
+              "Assess how heritage motifs translate into product displays.",
+              "Note community programming or collabs with local creatives."
+            ]
+          },
+          {
+            name: "OSULLOC Tea House (Bukchon)",
+            photos: [
+              "assets/bukchon/osulloc_1.jpg",
+              "assets/bukchon/osulloc_2.jpg",
+              "assets/bukchon/osulloc_3.jpg",
+              "assets/bukchon/osulloc_4.jpg"
+            ],
+            why:
+              "A serene hanok tea space with Jeju-grown teas, desserts, and tea-tasting—great for pacing and decompression in a heritage walk.",
+            experience: [
+              "Try a guided tea tasting; time service cadence at peak hours.",
+              "Note merch/boutique zoning vs. café seating split.",
+              "Collect ideas for ‘ritualized’ service that adds perceived value."
+            ]
+          },
+          {
+            name: "YLESS Café (Bukchon) — Dessert & Hanok Vibes",
+            photos: [
+              "assets/bukchon/yless_1.jpg",
+              "assets/bukchon/yless_2.jpg",
+              "assets/bukchon/yless_3.jpg",
+              "assets/bukchon/yless_4.jpg"
+            ],
+            why:
+              "A photogenic café spot circulating on social channels—useful to see how ‘aesthetics + dessert’ drive footfall and user‑generated content in Bukchon.",
+            experience: [
+              "Benchmark line control and seat turnover at dessert peaks.",
+              "Check menu engineering around hero items for photos.",
+              "Observe outdoor/hanok‑frame shots that amplify reach."
+            ]
+          }
+        ]
+      }
+    };
+
+    // ------------------------------------------------------------
+    // 2) 상태 초기화 (URL 파라미터 → 현재 선택값 보정)
+    //    - URL 형식: program_cohort.html?date=2025-10-16&group=A
+    // ------------------------------------------------------------
+    const url = new URL(window.location.href);
+    const allDates = Object.keys(COHORT_PLAN); // 날짜 칩은 계획 기준
+    const defaultDate = url.searchParams.get("date") || allDates[0];
+    const defaultGroup = (url.searchParams.get("group") || "A").toUpperCase();
+
+    let currentDate = COHORT_PLAN[defaultDate] ? defaultDate : allDates[0];
+    let currentCohort = (defaultGroup === "B") ? "B" : "A";
+
+    // ------------------------------------------------------------
+    // 3) 날짜 칩 렌더링
+    // ------------------------------------------------------------
+    const dateChipsEl = document.getElementById("dateChips");
+    function renderDateChips() {
+      dateChipsEl.innerHTML = "";
+      allDates.forEach(d => {
+        const btn = document.createElement("button");
+        btn.className =
+          "date-chip whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium ring-1 transition " +
+          (d === currentDate
+            ? "bg-slate-900 text-white ring-slate-900"
+            : "bg-white text-slate-700 hover:bg-slate-100 ring-slate-200");
+        btn.textContent = d;
+        btn.setAttribute("data-date", d);
+        btn.addEventListener("click", () => {
+          currentDate = d;
+          updateURL();
+          renderDateChips();
+          renderBanner();
+          renderContent();
+        });
+        dateChipsEl.appendChild(btn);
+      });
+    }
+
+    // ------------------------------------------------------------
+    // 4) 그룹 토글 동작 (Group A / Group B) — 지역은 계획표로 자동 결정
+    // ------------------------------------------------------------
+    document.querySelectorAll(".cohort-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        currentCohort = btn.dataset.cohort;
+        document.querySelectorAll(".cohort-btn").forEach(b => {
+          const isActive = (b.dataset.cohort === currentCohort);
+          b.setAttribute("aria-selected", isActive ? "true" : "false");
+          b.classList.toggle("bg-white", isActive);
+          b.classList.toggle("text-slate-900", isActive);
+          b.classList.toggle("shadow", isActive);
+        });
+        updateURL();
+        renderBanner();
+        renderContent();
+      });
+    });
+    // 초기 선택 버튼 스타일 적용
+    document.querySelector(`.cohort-btn[data-cohort="${currentCohort}"]`)?.classList.add("bg-white","text-slate-900","shadow");
+
+    // ------------------------------------------------------------
+    // 5) 안내 배너 렌더링 (오늘 날짜 기준 그룹별 지역 안내)
+    // ------------------------------------------------------------
+    const bannerEl = document.getElementById("banner");
+    function renderBanner() {
+      const plan = COHORT_PLAN[currentDate];
+      const areaA = plan?.A || "-";
+      const areaB = plan?.B || "-";
+      const pretty = (area) => area === "dosan" ? "Dosan" : area === "bukchon" ? "Bukchon" : "-";
+      bannerEl.innerHTML = `
+        <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+          <div class="text-slate-700"><strong>${currentDate}</strong> — Alternating schedule by cohort.</div>
+          <div class="sm:ml-auto grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 ring-1 ring-slate-200">
+              <span class="inline-block w-2 h-2 rounded-full bg-slate-800"></span>
+              <span><strong>Group A</strong>: ${pretty(areaA)}</span>
+            </div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 ring-1 ring-slate-200">
+              <span class="inline-block w-2 h-2 rounded-full bg-slate-400"></span>
+              <span><strong>Group B</strong>: ${pretty(areaB)}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // ------------------------------------------------------------
+    // 6) 본문 콘텐츠 렌더링 (장소 카드 생성)
+    //    - 현재 날짜(currentDate) + 현재 그룹(currentCohort)의 지역을 계산
+    // ------------------------------------------------------------
+    const contentEl = document.getElementById("content");
+    function renderContent() {
+      const plan = COHORT_PLAN[currentDate] || {};
+      const area = plan[currentCohort]; // "dosan" | "bukchon"
+      const dayData = (DATA[currentDate] || {});
+      const venues = dayData[area] || [];
+
+      contentEl.innerHTML = "";
+
+      // 오늘 해당 그룹의 방문 지역 배지
+      const badge = document.createElement("div");
+      badge.className = "text-sm text-slate-600 mb-2";
+      badge.innerHTML = `<span class="px-2 py-1 rounded bg-slate-100 ring-1 ring-slate-200">Area today: <strong>${area ? (area === "dosan" ? "Dosan" : "Bukchon") : "-"}</strong></span>`;
+      contentEl.appendChild(badge);
+
+      if (!venues.length) {
+        const empty = document.createElement("div");
+        empty.className = "p-10 text-center text-slate-500";
+        empty.textContent = "No programs found for the selected date and cohort.";
+        contentEl.appendChild(empty);
+        return;
+      }
+
+      venues.forEach((v, idx) => {
+        const card = document.createElement("article");
+        card.className = "bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 overflow-hidden";
+
+        // (1) 장소명
+        const header = document.createElement("header");
+        header.className = "p-5 sm:p-6";
+        header.innerHTML = `<h2 class="text-2xl font-bold tracking-tight">${v.name}</h2>`;
+        card.appendChild(header);
+
+        // (2) 사진 슬라이더 (Swiper)
+        const sliderId = `swiper-${currentDate}-${currentCohort}-${idx}`;
+        const slider = document.createElement("div");
+        slider.className = "swiper w-full aspect-[16/9] sm:aspect-[21/9]";
+        slider.id = sliderId;
+
+        const wrapper = document.createElement("div");
+        wrapper.className = "swiper-wrapper";
+
+        (v.photos || []).forEach((src, i) => {
+          const slide = document.createElement("div");
+          slide.className = "swiper-slide";
+          slide.innerHTML = `
+            <img src="${src}" alt="${v.name} photo ${i+1}" class="w-full h-full object-cover" loading="lazy" />
+          `;
+          wrapper.appendChild(slide);
+        });
+
+        slider.appendChild(wrapper);
+        const pag = document.createElement("div"); pag.className = "swiper-pagination"; slider.appendChild(pag);
+        const prev = document.createElement("div"); prev.className = "swiper-button-prev"; slider.appendChild(prev);
+        const next = document.createElement("div"); next.className = "swiper-button-next"; slider.appendChild(next);
+        card.appendChild(slider);
+
+        // (3) 텍스트 섹션: Why / What you can experience
+        const sections = document.createElement("section");
+        sections.className = "p-5 sm:p-6 grid md:grid-cols-2 gap-6";
+
+        const why = document.createElement("div");
+        why.innerHTML = `
+          <h3 class="text-lg font-semibold">Why?</h3>
+          <p class="mt-2 text-slate-700 leading-relaxed">${v.why || ""}</p>
+        `;
+        sections.appendChild(why);
+
+        const exp = document.createElement("div");
+        const expList = (v.experience || []).map(item => `<li>${item}</li>`).join("");
+        exp.innerHTML = `
+          <h3 class="text-lg font-semibold">What you can experience</h3>
+          <ul class="mt-2 list-disc pl-5 space-y-1 text-slate-700">${expList}</ul>
+        `;
+        sections.appendChild(exp);
+
+        card.appendChild(sections);
+        contentEl.appendChild(card);
+
+        // Swiper 인스턴스 활성화
+        new Swiper('#' + sliderId, {
+          slidesPerView: 1,
+          spaceBetween: 8,
+          loop: true,
+          pagination: { el: '#' + sliderId + ' .swiper-pagination', clickable: true },
+          navigation: { nextEl: '#' + sliderId + ' .swiper-button-next', prevEl: '#' + sliderId + ' .swiper-button-prev' }
+        });
+      });
+    }
+
+    // ------------------------------------------------------------
+    // 7) URL 동기화 (?date=YYYY-MM-DD&group=A|B)
+    // ------------------------------------------------------------
+    function updateURL() {
+      const params = new URLSearchParams(window.location.search);
+      params.set("date", currentDate);
+      params.set("group", currentCohort);
+      const newUrl = window.location.pathname + "?" + params.toString();
+      window.history.replaceState({}, "", newUrl);
+    }
+
+    // 초기 렌더
+    renderDateChips();
+    renderBanner();
+    renderContent();
+  </script>
+</body>
+</html>
