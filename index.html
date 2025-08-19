@@ -105,10 +105,26 @@
 
     <!-- Day Selection -->
     <div id="dayMenu" class="space-y-3">
-      <button class="w-full py-3 bg-gray-200 text-lg font-semibold rounded hover:bg-gray-300">Day 1</button>
+      <button id="day1Btn" class="w-full py-3 bg-gray-200 text-lg font-semibold rounded hover:bg-gray-300">Day 1</button>
       <button id="day2Btn" class="w-full py-3 bg-gray-200 text-lg font-semibold rounded hover:bg-gray-300">Day 2</button>
       <button class="w-full py-3 bg-gray-200 text-lg font-semibold rounded hover:bg-gray-300">Day 3</button>
     </div>
+
+    <!-- Day1 submenu (NEW) -->
+    <div id="day1Submenu" class="space-y-3 hidden">
+      <button id="day1Opt1Btn" class="w-full py-3 bg-blue-100 text-blue-700 font-semibold rounded hover:bg-blue-200">
+        Day 1 — Menu A
+      </button>
+      <button id="day1Opt2Btn" class="w-full py-3 bg-blue-100 text-blue-700 font-semibold rounded hover:bg-blue-200">
+        Day 1 — Menu B
+      </button>
+      <button id="day1Opt3Btn" class="w-full py-3 bg-blue-100 text-blue-700 font-semibold rounded hover:bg-blue-200">
+        Day 1 — Menu C
+      </button>
+
+      <button id="backBtnFromDay1" class="w-full py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400">🔙 Back</button>
+    </div>
+
 
     <!-- Day2 submenu -->
     <div id="day2Submenu" class="space-y-3 hidden">
@@ -169,7 +185,39 @@
       day2Submenu.classList.remove('hidden');
       subtitle.innerText = 'Day 2 Program';
     });
-   
+    
+
+    // Day 1 submenu 요소 참조 (NEW)
+    const day1Submenu = document.getElementById('day1Submenu');
+
+    // Day 1 버튼 → Day 1 하위 메뉴 열기
+    document.getElementById('day1Btn').addEventListener('click', () => {
+      dayMenu.classList.add('hidden');      // 메인 메뉴 숨김
+      day1Submenu.classList.remove('hidden'); // Day1 서브메뉴 표시
+      subtitle.innerText = 'Day 1 Program';
+    });
+
+    // Day 1 하위 메뉴의 Back 버튼 → 메인으로 복귀
+    document.getElementById('backBtnFromDay1').addEventListener('click', () => {
+      day1Submenu.classList.add('hidden');
+      dayMenu.classList.remove('hidden');
+      subtitle.innerText = 'Please select a day';
+    });
+
+    // Day 1 하위 메뉴 3개 클릭 → (임시) 추후 연결 예정
+    document.getElementById('day1Opt1Btn').addEventListener('click', () => {
+      // TODO: 추후 원하는 페이지로 연결
+      // window.location.href = 'your_page_1.html';
+      alert('Coming soon: Day 1 — Menu A');
+    });
+    document.getElementById('day1Opt2Btn').addEventListener('click', () => {
+      // window.location.href = 'your_page_2.html';
+      alert('Coming soon: Day 1 — Menu B');
+    });
+    document.getElementById('day1Opt3Btn').addEventListener('click', () => {
+      // window.location.href = 'your_page_3.html';
+      alert('Coming soon: Day 1 — Menu C');
+    });
   </script>
 
 
