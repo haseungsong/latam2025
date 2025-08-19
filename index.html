@@ -8,21 +8,34 @@
   <!-- 👇 여기에 추가 (tailwind 밑에) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 
+
+  <style>
+  /* 배너 이미지 강제 정렬: 모바일은 왼쪽, PC는 40% 지점 */
+  #topBannerImg { object-position: left center; }           /* 기본(모바일) */
+  @media (min-width: 640px) {                               /* sm 이상(PC/태블릿) */
+    #topBannerImg { object-position: 40% center; }
+  }
+  </style>
+
+
 </head>
+
+
 <body class="bg-gray-100 min-h-screen relative p-4">
 
   <!-- ✅ Top banner matches main menu width -->
   <div class="w-full max-w-sm mx-auto mb-3">
-    <!-- 고정 비율 사용: 모바일 21:9, 데스크톱 5:2 -->
-    <div class="relative aspect-[21/9] sm:aspect-[5/2]">
-      <img src="assets/TOP_LOGO.jpg"
-          alt="Top Banner"
-          class="absolute inset-0 w-full h-full object-cover rounded-xl shadow opacity-95"
-          style="object-position: 40% center;" 
-          loading="lazy" />
+    <!-- 비율: 모바일 16:9 → PC 21:9 (좌우 과도한 크롭 완화) -->
+    <div class="relative aspect-[16/9] sm:aspect-[21/9]">
+      <img
+        id="topBannerImg"
+        src="assets/TOP_LOGO.jpg"
+        alt="Top Banner"
+        class="absolute inset-0 w-full h-full object-cover rounded-xl shadow opacity-95"
+        loading="lazy"
+      />
     </div>
   </div>
-
 
   <!-- ✅ 메인 박스 패딩 조정 -->
   <div id="mainContainer" class="w-full max-w-sm bg-white pt-6 pb-2 px-6 rounded-xl shadow text-center mx-auto space-y-4 mb-[100px]">
