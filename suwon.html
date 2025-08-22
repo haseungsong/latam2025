@@ -13,6 +13,7 @@
 </head>
 <body class="bg-slate-50 text-slate-900">
 
+
 <!-- 모달 -->
 <div id="day1Modal" class="fixed inset-0 hidden items-end sm:items-center justify-center z-50">
   <!-- backdrop -->
@@ -54,10 +55,10 @@
         <li>SIM guided tour (max 30 pax/slot): 11:00 (Spanish), 13:30 (English), 14:00 (Spanish).</li>
         <li>Groups: G1 = SELA+SEM · G2 = SEDA+SAMCOL · G3 = SECH+SEPR+SEASA.</li>
         <li>Lunch at R5; VIP rooms in R4 (booking available from September).</li>
-        <!-- 🔄 버튼으로 PDF 뷰어 열기 -->
+        <!-- 🔄 여기만 변경: 뷰어 페이지로 연결 -->
         <li>
           <button class="text-blue-600 underline"
-                  onclick="openPdf('assets/SIM_Brochure_english.pdf?v=2')">
+                  onclick="openPdf('assets/SIM%20Brochure_english.pdf')">
             SIM Brochure
           </button>
         </li>
@@ -68,7 +69,6 @@
     <div class="p-4 pt-0 text-right">
       <a href="index.html" class="text-sm text-blue-600 underline">← Back to Home</a>
     </div>
-  </div>
 </div>
 
 <script>
@@ -87,7 +87,8 @@ const COLORS = {
 const GROUPS = {
   1: [
     { t:"10:20–11:00",  k:"MX",   title:"Mobile Experience (MX)",     act:"Showroom tour" },
-    { t:"11:00–12:10",  k:"SIM",  title:"Samsung Innovation Museum",  act:"Guided tour (max 30)" , link:"assets/SIM_Brochure_english.pdf?v=2"},
+    // 🔄 link만 변경
+    { t:"11:00–12:10",  k:"SIM",  title:"Samsung Innovation Museum",  act:"Guided tour (max 30)" , link:"assets/SIM%20Brochure_english.pdf"},
     { t:"12:10–13:10",  k:"LUNCH",title:"Lunch",                      act:"R5 dining (VIP in R4)" },
     { t:"13:10–13:50",  k:"VD",   title:"Visual Display (VD)",        act:"Briefing / visit" },
     { t:"13:50–14:30",  k:"DA",   title:"Digital Appliances (DA)",    act:"Briefing / visit" },
@@ -100,7 +101,8 @@ const GROUPS = {
     { t:"11:00–11:40",  k:"MX",   title:"Mobile Experience (MX)",     act:"Showroom tour" },
     { t:"11:40–12:40",  k:"LUNCH",title:"Lunch",                      act:"R5 dining (VIP in R4)" },
     { t:"12:40–13:20",  k:"DA",   title:"Digital Appliances (DA)",    act:"Briefing / visit" },
-    { t:"13:30–14:40",  k:"SIM",  title:"Samsung Innovation Museum",  act:"Guided tour (max 30)" , link:"assets/SIM_Brochure_english.pdf?v=2"},
+    // 🔄 link만 변경
+    { t:"13:30–14:40",  k:"SIM",  title:"Samsung Innovation Museum",  act:"Guided tour (max 30)" , link:"assets/SIM%20Brochure_english.pdf"},
     { t:"14:50–15:20",  k:"MOVE", title:"Move",                       act:"Transfer to briefing hall" },
     { t:"15:20–15:40",  k:"B2C",  title:"B2C Briefing",               act:"Presentation" },
     { t:"15:40–16:10",  k:"BSS",  title:"BSS Briefing",               act:"Presentation" },
@@ -110,7 +112,8 @@ const GROUPS = {
     { t:"11:00–11:40",  k:"VD",   title:"Visual Display (VD)",        act:"Briefing / visit" },
     { t:"11:40–13:00",  k:"LUNCH",title:"Lunch & Break",              act:"R5 dining (VIP in R4)" },
     { t:"13:00–13:40",  k:"MX",   title:"Mobile Experience (MX)",     act:"Showroom tour" },
-    { t:"14:00–15:10",  k:"SIM",  title:"Samsung Innovation Museum",  act:"Guided tour (max 30)" , link:"assets/SIM_Brochure_english.pdf?v=2"},
+    // 🔄 link만 변경
+    { t:"14:00–15:10",  k:"SIM",  title:"Samsung Innovation Museum",  act:"Guided tour (max 30)" , link:"assets/SIM%20Brochure_english.pdf"},
     { t:"15:10–15:40",  k:"MOVE", title:"Move",                       act:"Transfer to briefing hall" },
     { t:"15:40–16:00",  k:"B2C",  title:"B2C Briefing",               act:"Presentation" },
     { t:"16:00–16:30",  k:"BSS",  title:"BSS Briefing",               act:"Presentation" },
@@ -216,6 +219,7 @@ document.addEventListener("DOMContentLoaded", () => {
     modal.classList.remove("hidden");
     modal.classList.add("flex");
   }
+  // 기본 그룹 UI & 타임라인 렌더
   if (typeof setActiveGroupUI === "function") setActiveGroupUI();
   if (typeof renderTimeline === "function") renderTimeline();
 });
@@ -229,6 +233,8 @@ if (openBtn) {
     setActiveGroupUI?.(); renderTimeline?.();
   });
 }
+
+
 </script>
 
 <!-- ===== PDF Viewer Modal (suwon.html 내부) ===== -->
@@ -245,51 +251,67 @@ if (openBtn) {
 </div>
 
 <script>
-  // === 네가 준 로직 그대로: 모바일은 GDocs, 데스크톱은 네이티브→폴백 ===
-  function openPdf(src) {
-    try {
-      const abs = new URL(src, location.href).href; // 절대경로
-      const frame = document.getElementById('pdfFrame');
-      const ua = navigator.userAgent || '';
-      const isMobile = /Android|iPhone|iPad|iPod|SamsungBrowser|CriOS/i.test(ua);
+function openPdf(src) {
+  try {
+    const abs = new URL(src, location.href).href; // 절대경로
+    const frame = document.getElementById('pdfFrame');
+    const ua = navigator.userAgent || '';
+    const isMobile = /Android|iPhone|iPad|iPod|SamsungBrowser|CriOS/i.test(ua);
+    const isSamsung = /SamsungBrowser/i.test(ua);
 
-      // 1) 모바일: 바로 GDocs Viewer로
-      if (isMobile) {
-        frame.src = 'https://docs.google.com/gview?embedded=1&url=' + encodeURIComponent(abs);
-        document.getElementById('pdfModal').classList.remove('hidden');
-        document.getElementById('pdfModal').classList.add('flex');
-        return;
-      }
+    // PDF.js 공식 데모 뷰어 (CORS 허용 필요: github.io는 허용됨)
+    const pdfjs = 'https://mozilla.github.io/pdf.js/web/viewer.html?file=' + encodeURIComponent(abs);
+    // 구글 문서뷰어(일부 단말에서 실패할 수 있음)
+    const gview = 'https://docs.google.com/gview?embedded=1&url=' + encodeURIComponent(abs);
 
-      // 2) 데스크톱: 먼저 네이티브로 시도, 1.2초 안에 제대로 안 뜨면 GDocs로 폴백
-      frame.src = abs;
+    // 1) 모바일(특히 삼성브라우저)은 PDF.js로 바로
+    if (isMobile) {
+      frame.src = pdfjs;
       document.getElementById('pdfModal').classList.remove('hidden');
       document.getElementById('pdfModal').classList.add('flex');
-
-      const t = setTimeout(() => {
-        if (!frame.src.includes('docs.google.com/gview')) {
-          frame.src = 'https://docs.google.com/gview?embedded=1&url=' + encodeURIComponent(abs);
-        }
-      }, 1200);
-
-      frame.onload = () => clearTimeout(t);
-    } catch (e) {
-      alert('PDF를 열 수 없습니다. 경로를 확인해 주세요.');
+      return;
     }
-  }
 
-  function closePdf() {
-    const modal = document.getElementById('pdfModal');
-    modal.classList.add('hidden');
-    modal.classList.remove('flex');
-    document.getElementById('pdfFrame').src = 'about:blank';
-  }
+    // 2) 데스크톱: 네이티브 → 1.2초 안 뜨면 PDF.js → 그래도 안되면 gview
+    frame.src = abs;
+    document.getElementById('pdfModal').classList.remove('hidden');
+    document.getElementById('pdfModal').classList.add('flex');
 
-  // 바깥 영역 클릭 시 닫기
-  document.getElementById('pdfModal').addEventListener('click', (e) => {
-    if (e.target.id === 'pdfModal') closePdf();
-  });
+    let step = 0;
+    const fallback = () => {
+      step++;
+      if (step === 1) {
+        frame.src = pdfjs;
+        // PDF.js도 1.2초 안에 실패하면 gview
+        setTimeout(() => {
+          if (!frame.src.includes('docs.google.com/gview') &&
+              !frame.src.includes('/pdf.js/web/viewer.html')) {
+            frame.src = gview;
+          }
+        }, 1200);
+      } else if (step === 2) {
+        frame.src = gview;
+      }
+    };
+
+    const t = setTimeout(fallback, 1200);
+    frame.onload = () => clearTimeout(t);
+  } catch (e) {
+    alert('PDF를 열 수 없습니다. 경로를 확인해 주세요.');
+  }
+}
+
+function closePdf() {
+  const modal = document.getElementById('pdfModal');
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+  document.getElementById('pdfFrame').src = 'about:blank';
+}
+document.getElementById('pdfModal').addEventListener('click', (e) => {
+  if (e.target.id === 'pdfModal') closePdf();
+});
 </script>
 
 </body>
 </html>
+
