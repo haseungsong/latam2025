@@ -55,8 +55,9 @@
         <li>SIM guided tour (max 30 pax/slot): 11:00 (Spanish), 13:30 (English), 14:00 (Spanish).</li>
         <li>Groups: G1 = SELA+SEM · G2 = SEDA+SAMCOL · G3 = SECH+SEPR+SEASA.</li>
         <li>Lunch at R5; VIP rooms in R4 (booking available from September).</li>
+        <!-- 🔄 여기만 변경: 뷰어 페이지로 연결 -->
         <li><a class="text-blue-600 underline" target="_blank"
-           href="assets/SIM%20Brochure_english.pdf">SIM Brochure</a></li>
+           href="pdf.html?src=assets/SIM%20Brochure_english.pdf">SIM Brochure</a></li>
       </ul>
     </section>
 
@@ -82,7 +83,8 @@ const COLORS = {
 const GROUPS = {
   1: [
     { t:"10:20–11:00",  k:"MX",   title:"Mobile Experience (MX)",     act:"Showroom tour" },
-    { t:"11:00–12:10",  k:"SIM",  title:"Samsung Innovation Museum",  act:"Guided tour (max 30)" , link:"assets/SIM%20Brochure_english.pdf"},
+    // 🔄 link만 변경
+    { t:"11:00–12:10",  k:"SIM",  title:"Samsung Innovation Museum",  act:"Guided tour (max 30)" , link:"pdf.html?src=assets/SIM%20Brochure_english.pdf"},
     { t:"12:10–13:10",  k:"LUNCH",title:"Lunch",                      act:"R5 dining (VIP in R4)" },
     { t:"13:10–13:50",  k:"VD",   title:"Visual Display (VD)",        act:"Briefing / visit" },
     { t:"13:50–14:30",  k:"DA",   title:"Digital Appliances (DA)",    act:"Briefing / visit" },
@@ -95,7 +97,8 @@ const GROUPS = {
     { t:"11:00–11:40",  k:"MX",   title:"Mobile Experience (MX)",     act:"Showroom tour" },
     { t:"11:40–12:40",  k:"LUNCH",title:"Lunch",                      act:"R5 dining (VIP in R4)" },
     { t:"12:40–13:20",  k:"DA",   title:"Digital Appliances (DA)",    act:"Briefing / visit" },
-    { t:"13:30–14:40",  k:"SIM",  title:"Samsung Innovation Museum",  act:"Guided tour (max 30)" , link:"assets/SIM%20Brochure_english.pdf"},
+    // 🔄 link만 변경
+    { t:"13:30–14:40",  k:"SIM",  title:"Samsung Innovation Museum",  act:"Guided tour (max 30)" , link:"pdf.html?src=assets/SIM%20Brochure_english.pdf"},
     { t:"14:50–15:20",  k:"MOVE", title:"Move",                       act:"Transfer to briefing hall" },
     { t:"15:20–15:40",  k:"B2C",  title:"B2C Briefing",               act:"Presentation" },
     { t:"15:40–16:10",  k:"BSS",  title:"BSS Briefing",               act:"Presentation" },
@@ -105,7 +108,8 @@ const GROUPS = {
     { t:"11:00–11:40",  k:"VD",   title:"Visual Display (VD)",        act:"Briefing / visit" },
     { t:"11:40–13:00",  k:"LUNCH",title:"Lunch & Break",              act:"R5 dining (VIP in R4)" },
     { t:"13:00–13:40",  k:"MX",   title:"Mobile Experience (MX)",     act:"Showroom tour" },
-    { t:"14:00–15:10",  k:"SIM",  title:"Samsung Innovation Museum",  act:"Guided tour (max 30)" , link:"assets/SIM%20Brochure_english.pdf"},
+    // 🔄 link만 변경
+    { t:"14:00–15:10",  k:"SIM",  title:"Samsung Innovation Museum",  act:"Guided tour (max 30)" , link:"pdf.html?src=assets/SIM%20Brochure_english.pdf"},
     { t:"15:10–15:40",  k:"MOVE", title:"Move",                       act:"Transfer to briefing hall" },
     { t:"15:40–16:00",  k:"B2C",  title:"B2C Briefing",               act:"Presentation" },
     { t:"16:00–16:30",  k:"BSS",  title:"BSS Briefing",               act:"Presentation" },
@@ -141,13 +145,13 @@ function renderTimeline(){
   renderBadge(items);
   timeline.innerHTML = items.map(i=>{
     const color = COLORS[i.k] || "bg-slate-200 text-slate-900";
-    const tag   = `<span class="inline-flex items-center px-2 py-0.5 rounded ${color} text-[11px] font-semibold">${i.k}</span>`;
+    const tag   = <span class="inline-flex items-center px-2 py-0.5 rounded ${color} text-[11px] font-semibold">${i.k}</span>;
     const actionBtn = i.link
       ? `<a href="${i.link}" target="_blank" rel="noopener"
           class="px-3 py-2 rounded-xl bg-blue-600 text-white text-xs font-semibold">
           Open SIM brochure (EN)
         </a>`
-      : `<button class="px-3 py-2 rounded-xl bg-slate-900 text-white text-xs font-semibold">Details</button>`;
+      : <button class="px-3 py-2 rounded-xl bg-slate-900 text-white text-xs font-semibold">Details</button>;
     return `
     <article class="rounded-2xl ring-1 ring-slate-200 bg-white p-3">
       <div class="flex gap-3">
