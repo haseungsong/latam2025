@@ -112,11 +112,11 @@
 
     <!-- Day1 submenu (NEW) -->
     <div id="day1Submenu" class="space-y-3 hidden">
-      <button id="day1Opt1Btn"
-              onclick="window.location.href='suwon.html'"
-              class="w-full py-3 bg-blue-100 text-blue-700 font-semibold rounded hover:bg-blue-200">
+      <a id="day1Opt1Btn"
+        href="suwon.html"
+        class="w-full py-3 bg-blue-100 text-blue-700 font-semibold rounded hover:bg-blue-200 block text-center">
         Day 1 — Samsung Digital City (Suwon)
-      </button>
+      </a>
       <button id="day1Opt2Btn" class="w-full py-3 bg-blue-100 text-blue-700 font-semibold rounded hover:bg-blue-200">
         Day 1 — Menu B
       </button>
@@ -207,16 +207,7 @@
     });
 
     // Day 1 하위 메뉴 3개 클릭 → (임시) 추후 연결 예정
-    const day1Modal = document.getElementById("day1Modal");
-    document.getElementById('day1Opt1Btn').addEventListener('click', () => {
-      // 메인 메뉴 닫기
-      document.getElementById("day1Submenu").classList.add("hidden");
-      // 모달 열기
-      day1Modal.classList.remove("hidden");
-      day1Modal.classList.add("flex");
-      setActiveGroupUI();
-      renderTimeline();
-    });
+
     document.getElementById('day1Opt2Btn').addEventListener('click', () => {
       // window.location.href = 'your_page_2.html';
       alert('Coming soon: Day 1 — Menu B');
