@@ -58,7 +58,11 @@
            href="https://www.samsunginnovationmuseum.com/samsunglogin.jsp">SIM login page</a></li>
       </ul>
     </section>
-  </div>
+
+    <!-- ✅ 모달 카드 안에 배치 (Notes 아래) -->
+    <div class="p-4 pt-0 text-right">
+      <a href="index.html" class="text-sm text-blue-600 underline">← Back to Home</a>
+    </div>
 </div>
 
 <script>
@@ -172,6 +176,13 @@ document.getElementById("closeBackdrop").addEventListener("click", ()=> closeMod
 function closeModal(){
   const m = document.getElementById("day1Modal");
   m.classList.add("hidden"); m.classList.remove("flex");
+
+  // ✅ 뒤로갈 이력이 있으면 back, 없으면 index로 이동
+  if (window.history.length > 1) {
+    setTimeout(()=> history.back(), 0);
+  } else {
+    window.location.href = "index.html";
+  }
 }
 document.addEventListener("keydown", (e)=>{
   if(e.key==="Escape") closeModal();
