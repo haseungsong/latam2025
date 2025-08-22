@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Thank You — LATAM CEO CONFERENCE</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .card { animation: fadeInUp .4s ease-out both }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(8px) }
+      to   { opacity: 1; transform: translateY(0) }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900">
+  <main class="max-w-xl mx-auto p-6">
+    <!-- Top logo (optional) -->
+    <header class="text-center mb-6">
+      <img src="assets/TOP_LOGO.jpg" alt="LATAM CEO CONFERENCE" class="mx-auto w-28" onerror="this.style.display='none'"/>
+    </header>
+
+    <!-- Thank you card -->
+    <section class="card bg-white rounded-2xl shadow p-6 sm:p-8 text-center">
+      <!-- Icon -->
+      <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
+
+      <h1 class="text-2xl sm:text-3xl font-bold mb-2">Thank you for your feedback!</h1>
+      <p class="text-lg text-slate-700 leading-7">
+        We truly appreciate the time you took to share your thoughts on the
+        <span class="font-semibold">LATAM CEO CONFERENCE</span>.
+        Your insights help us refine the experience and deliver even more value at our next event.
+      </p>
+
+      <hr class="my-6 border-slate-200">
+
+      <div class="text-left space-y-3 text-slate-700">
+        <p class="font-semibold">What happens next</p>
+        <ul class="list-disc pl-5 space-y-1">
+          <li>We will review all responses and identify key opportunities to improve.</li>
+          <li>A concise summary of insights will be shared with participating teams.</li>
+          <li>Selected suggestions may inform program design, hospitality, and business sessions for the next conference.</li>
+        </ul>
+      </div>
+
+      <div class="mt-6 text-slate-700">
+        <p>If you have additional comments, feel free to reach us at
+          <a href="mailto:latam.conference@samsung.com" class="text-blue-700 underline">latam.conference@samsung.com</a>.
+        </p>
+      </div>
+
+      <div class="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+        <a href="index.html"
+           class="px-5 py-3 rounded-xl bg-blue-600 text-white font-semibold text-center hover:bg-blue-700">
+          ⬅ Back to Home
+        </a>
+        <a href="survey.html"
+           class="px-5 py-3 rounded-xl bg-slate-200 text-slate-900 font-semibold text-center hover:bg-slate-300">
+          Submit another response
+        </a>
+      </div>
+    </section>
+
+    <footer class="text-center text-xs text-slate-500 mt-6">
+      © LATAM CEO CONFERENCE
+    </footer>
+  </main>
+
+  <script>
+    // optional: clear any leftover draft just in case
+    try { localStorage.removeItem('survey_draft_v1'); } catch(e){}
+  </script>
+</body>
+</html>
