@@ -17,8 +17,11 @@
     <!-- Header -->
     <header class="mb-4 sm:mb-6">
       <img src="assets/TOP_LOGO.jpg" alt="SAMSUNG" class="w-28" onerror="this.style.display='none'"/>
-      <h1 class="text-3xl sm:text-4xl font-bold mt-3">Survey</h1>
-      <p class="text-slate-600 mt-1 text-lg">Please answer a few short questions. Large buttons = easy taps 👍</p>
+      <h1 class="text-3xl sm:text-4xl font-bold mt-3 mb-4">Survey</h1>
+      <p class="text-lg leading-7 text-slate-800">
+        We hope you had a great time at <span class="font-semibold">Power of Konnection</span>.
+      </p>
+      <p class="text-lg leading-7 text-slate-700">Please fill out the survey below by marking it with an <span class="font-extrabold">X</span> and feel free to give us suggestions. <span class="text-slate-500">(On mobile, just tap to select.)</span></p>
     </header>
 
     <!-- Progress -->
@@ -239,7 +242,7 @@
       for(let i=0;i<=10;i++){
         const b = document.createElement('button');
         b.type = 'button';
-        b.className = 'tap w-full rounded-xl border p-3 text-lg font-semibold bg-white';
+        b.className = 'tap w-full rounded-xl border p-3 text-lg font-semibold bg-white flex items-center justify-center text-center leading-none';
         b.textContent = i;
         if(cur===i) b.classList.add('!bg-blue-600','!text-white');
         b.addEventListener('click', ()=>{
