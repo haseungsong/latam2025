@@ -205,10 +205,15 @@
     });
 
     // Day 1 하위 메뉴 3개 클릭 → (임시) 추후 연결 예정
+    const day1Modal = document.getElementById("day1Modal");
     document.getElementById('day1Opt1Btn').addEventListener('click', () => {
-      // TODO: 추후 원하는 페이지로 연결
-      // window.location.href = 'your_page_1.html';
-      alert('Coming soon: Day 1 — Menu A');
+      // 메인 메뉴 닫기
+      document.getElementById("day1Submenu").classList.add("hidden");
+      // 모달 열기
+      day1Modal.classList.remove("hidden");
+      day1Modal.classList.add("flex");
+      setActiveGroupUI();
+      renderTimeline();
     });
     document.getElementById('day1Opt2Btn').addEventListener('click', () => {
       // window.location.href = 'your_page_2.html';
