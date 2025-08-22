@@ -252,39 +252,45 @@ if (openBtn) {
 
 <script>
   // PDF 열기 (가능하면 기본 iframe로, 문제 있으면 GDocs Viewer로 자동 폴백)
-  function openPdf(src) {
+function openPdf(src) {
     try {
       const abs = new URL(src, location.href).href; // 절대경로
       const frame = document.getElementById('pdfFrame');
-      // 1차: 브라우저 네이티브 PDF 뷰어
+      const ua = navigator.userAgent || '';
+      const isMobile = /Android|iPhone|iPad|iPod|SamsungBrowser|CriOS/i.test(ua);
+
+      // 1) 모바일: 바로 GDocs Viewer로
+      if (isMobile) {
+        frame.src = 'https://docs.google.com/gview?embedded=1&url=' + encodeURIComponent(abs);
+        document.getElementById('pdfModal').classList.remove('hidden');
+        document.getElementById('pdfModal').classList.add('flex');
+        return;
+      }
+
+      // 2) 데스크톱: 먼저 네이티브로 시도, 1.2초 안에 제대로 안 뜨면 GDocs로 폴백
       frame.src = abs;
-      // 모달 표시
       document.getElementById('pdfModal').classList.remove('hidden');
       document.getElementById('pdfModal').classList.add('flex');
 
-      // 2~3초 안에 로드 실패 시 GDocs Viewer로 폴백
-      // (일부 모바일 브라우저가 '다운로드만' 시도하는 경우 대비)
       const t = setTimeout(() => {
-        // 이미 다른 문서가 로드되어 있으면 건너뜀
-        // 간단히 gview 포함 여부로 체크
         if (!frame.src.includes('docs.google.com/gview')) {
           frame.src = 'https://docs.google.com/gview?embedded=1&url=' + encodeURIComponent(abs);
         }
-      }, 1500);
-      // iframe 로드되면 타이머 해제
+      }, 1200);
+
       frame.onload = () => clearTimeout(t);
     } catch (e) {
       alert('PDF를 열 수 없습니다. 경로를 확인해 주세요.');
     }
   }
+
   function closePdf() {
     const modal = document.getElementById('pdfModal');
     modal.classList.add('hidden');
     modal.classList.remove('flex');
-    // 메모리/오디오 정리용으로 src 비우기
     document.getElementById('pdfFrame').src = 'about:blank';
   }
-  // 바깥 영역 클릭 시 닫기
+
   document.getElementById('pdfModal').addEventListener('click', (e) => {
     if (e.target.id === 'pdfModal') closePdf();
   });
