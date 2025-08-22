@@ -16,7 +16,6 @@
   <main class="max-w-xl mx-auto p-4 sm:p-6">
     <!-- Header -->
     <header class="mb-4 sm:mb-6">
-      <img src="assets/TOP_LOGO.jpg" alt="SAMSUNG" class="w-28" onerror="this.style.display='none'"/>
       <h1 class="text-3xl sm:text-4xl font-bold mt-3 mb-4">Survey</h1>
       <p class="text-lg leading-7 text-slate-800">
         We hope you had a great time at <span class="font-semibold">Power of Konnection</span>.
@@ -154,31 +153,16 @@
     <footer class="text-center text-xs text-slate-500 mt-6">Power of Konnection</footer>
   </main>
 
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-
   <script>
   /********************
-   * 1) CONFIG — Edit this
+   * 0) APPS SCRIPT ENDPOINT (Google Sheets Web App)
    ********************/
-  const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    projectId: "YOUR_PROJECT",
-    storageBucket: "YOUR_PROJECT.appspot.com",
-    messagingSenderId: "",
-    appId: ""
-  };
-  // Collection name in Firestore
-  const COLLECTION = 'latam_forum_survey';
+  const APPS_SCRIPT_URL = 'YOUR_WEB_APP_URL'; // <-- Apps Script에서 배포한 Web App URL로 교체
+  const SHARED_SECRET = 'CHANGE_THIS_TO_A_RANDOM_SECRET'; // 간단한 인증 토큰(HTML/Apps Script 동일 값)
 
   /********************
-   * 2) INIT
+   * 1) INIT
    ********************/
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-
   const form = document.getElementById('surveyForm');
   const steps = Array.from(document.querySelectorAll('.step'));
   const btnPrev = document.getElementById('btnPrev');
@@ -295,22 +279,34 @@
     alert('Saved on this device. You can close and come back later.');
   });
 
-  // Submit handler — Firestore direct write (Option B)
+  // Submit handler — Google Sheets (Apps Script Web App)
   form.addEventListener('submit', async (e)=>{
     e.preventDefault();
     // basic validation
     if(!state.data.subsidiary || !state.data.group){
       showStep(1); alert('Please complete required fields.'); return;
     }
+
     const payload = {
       ...state.data,
       created_at: new Date().toISOString(),
       user_agent: navigator.userAgent,
+      _secret: SHARED_SECRET
     };
 
     toggleLoading(true);
     try{
-      await db.collection(COLLECTION).add(payload);
+      const res = await fetch(APPS_SCRIPT_URL, {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if(!res.ok){
+        const t = await res.text();
+        throw new Error('HTTP '+res.status+' '+t);
+      }
+      const json = await res.json(); // {ok:true}
+      if(!json.ok) throw new Error('Submission failed');
       localStorage.removeItem(LS_KEY);
       toggleLoading(false);
       alert('Thank you! Your response has been submitted.');
@@ -320,18 +316,6 @@
       console.error(err);
       alert('Submission failed. Please check your connection and try again.');
     }
-
-    /*
-    // Option A: POST to Cloud Functions endpoint instead of direct Firestore
-    try{
-      const res = await fetch('https://YOUR_REGION-YOUR_PROJECT.cloudfunctions.net/submitSurvey',{
-        method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)
-      });
-      if(!res.ok) throw new Error('HTTP '+res.status);
-      localStorage.removeItem(LS_KEY);
-      alert('Thank you! Your response has been submitted.');
-    }catch(e){ alert('Failed to submit.'); }
-    */
   });
 
   function toggleLoading(on){
@@ -351,45 +335,9 @@
   </script>
 
   <!--
-  =============================
-  FIREBASE SECURITY RULES (Option B: direct write)
-  Console > Firestore > Rules
-  -----------------------------
-  rules_version = '2';
-  service cloud.firestore {
-    match /databases/{database}/documents {
-      match /latam_forum_survey/{docId} {
-        allow create: if request.time < timestamp.date(2100,1,1)
-          && request.resource.data.keys().hasAll(['subsidiary','group','created_at'])
-          && request.resource.data.subsidiary is string
-          && request.resource.data.group is string
-          && request.resource.data.created_at is string
-          && request.resource.data.size() <= 50; // prevent spam payloads
-        allow read, update, delete: if false; // public cannot read
-      }
-    }
-  }
-
-  =============================
-  CLOUD FUNCTIONS (Option A)
-  functions/index.js (Node 18)
-  -----------------------------
-  const functions = require('firebase-functions/v2/https');
-  const admin = require('firebase-admin');
-  admin.initializeApp();
-  exports.submitSurvey = functions.onRequest(async (req, res) => {
-    res.set('Access-Control-Allow-Origin','*');
-    if (req.method === 'OPTIONS') return res.status(204).send('');
-    if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
-    const data = req.body || {};
-    try{
-      await admin.firestore().collection('latam_forum_survey').add({
-        ...data,
-        server_ts: admin.firestore.FieldValue.serverTimestamp(),
-      });
-      res.json({ok:true});
-    }catch(e){ res.status(500).json({ok:false, error: String(e)}); }
-  });
+  NOTE:
+  - Firebase 저장 대신 Google Sheets Web App으로 전송합니다.
+  - thankyou.html은 동일 경로에 파일을 만들어 사용하세요(간단한 "감사합니다" 페이지).
   -->
 </body>
 </html>
