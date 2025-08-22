@@ -60,19 +60,19 @@
         <p class="text-slate-600 mb-4">Tap a number (0–10). Bigger = better.</p>
         <div class="space-y-6">
           <div>
-            <label class="block font-medium mb-2">Power of Konnection — Latin Forum 2023</label>
+            <label class="block font-semibold mb-2 text-xl sm:text-2xl">Power of Konnection — Latin Forum 2023</label>
             <div class="likert" data-key="overall_forum"></div>
           </div>
           <div>
-            <label class="block font-medium mb-2">Samsung Digital City visit</label>
+            <label class="block font-semibold mb-2 text-xl sm:text-2xl">Samsung Digital City visit</label>
             <div class="likert" data-key="digital_city"></div>
           </div>
           <div>
-            <label class="block font-medium mb-2">Business Meetings</label>
+            <label class="block font-semibold mb-2 text-xl sm:text-2xl">Business Meetings</label>
             <div class="likert" data-key="meetings"></div>
           </div>
           <div>
-            <label class="block font-medium mb-2">Gala Dinner</label>
+            <label class="block font-semibold mb-2 text-xl sm:text-2xl">Gala Dinner</label>
             <div class="likert" data-key="gala"></div>
           </div>
         </div>
@@ -83,11 +83,11 @@
         <h2 class="text-2xl font-semibold mb-2">Hospitality</h2>
         <div class="space-y-6">
           <div>
-            <label class="block font-medium mb-2">Busan Hospitality day</label>
+            <label class="block font-semibold mb-2 text-xl sm:text-2xl">Busan Hospitality day</label>
             <div class="likert" data-key="busan_day"></div>
           </div>
           <div>
-            <label class="block font-medium mb-2">Seoul Hospitality day</label>
+            <label class="block font-semibold mb-2 text-xl sm:text-2xl">Seoul Hospitality day</label>
             <div class="likert" data-key="seoul_day"></div>
           </div>
         </div>
@@ -98,23 +98,23 @@
         <h2 class="text-2xl font-semibold mb-2">Food & Beverage</h2>
         <div class="space-y-6">
           <div>
-            <label class="block font-medium mb-2">Welcome Dinner</label>
+            <label class="block font-semibold mb-2 text-xl sm:text-2xl">Welcome Dinner</label>
             <div class="likert" data-key="welcome_dinner"></div>
           </div>
           <div>
-            <label class="block font-medium mb-2">Busan Lunch</label>
+            <label class="block font-semibold mb-2 text-xl sm:text-2xl">Busan Lunch</label>
             <div class="likert" data-key="busan_lunch"></div>
           </div>
           <div>
-            <label class="block font-medium mb-2">Busan Happy Hour</label>
+            <label class="block font-semibold mb-2 text-xl sm:text-2xl">Busan Happy Hour</label>
             <div class="likert" data-key="busan_happy"></div>
           </div>
           <div>
-            <label class="block font-medium mb-2">Seoul Lunch</label>
+            <label class="block font-semibold mb-2 text-xl sm:text-2xl">Seoul Lunch</label>
             <div class="likert" data-key="seoul_lunch"></div>
           </div>
           <div>
-            <label class="block font-medium mb-2">Seoul Dinner</label>
+            <label class="block font-semibold mb-2 text-xl sm:text-2xl">Seoul Dinner</label>
             <div class="likert" data-key="seoul_dinner"></div>
           </div>
         </div>
@@ -125,15 +125,15 @@
         <h2 class="text-2xl font-semibold mb-2">Final</h2>
         <div class="space-y-4">
           <label class="block">
-            <span class="block font-medium mb-2">Any additional comments and/or suggestions?</span>
+            <span class="block font-semibold mb-2 text-xl sm:text-2xl">Any additional comments and/or suggestions?</span>
             <textarea id="comments" class="w-full rounded-xl border border-slate-300 p-3 text-lg" rows="4" placeholder="Type here…"></textarea>
           </label>
           <label class="block">
-            <span class="block font-medium mb-2">When would you suggest having the next Latin Forum?</span>
+            <span class="block font-semibold mb-2 text-xl sm:text-2xl">When would you suggest having the next Latin Forum?</span>
             <input id="next_when" type="text" class="w-full rounded-xl border border-slate-300 p-3 text-lg" placeholder="e.g., July 2026"/>
           </label>
           <label class="block">
-            <span class="block font-medium mb-2">Where would you suggest having the next Latin Forum?</span>
+            <span class="block font-semibold mb-2 text-xl sm:text-2xl">Where would you suggest having the next Latin Forum?</span>
             <input id="next_where" type="text" class="w-full rounded-xl border border-slate-300 p-3 text-lg" placeholder="e.g., São Paulo"/>
           </label>
         </div>
@@ -176,11 +176,85 @@
   const LS_KEY = 'survey_draft_v1';
   const state = loadDraft() || { step:1, data:{} };
 
-  // Options data
+  // ✅ 필수 항목 정의
+  const REQUIRED_KEYS_BY_STEP = {
+    1: ['subsidiary','group'],
+    2: ['overall_forum','digital_city','meetings','gala'],
+    3: ['busan_day','seoul_day'],
+    4: ['welcome_dinner','busan_lunch','busan_happy','seoul_lunch','seoul_dinner'],
+    5: ['comments','next_when','next_where'],
+  };
+
+  const LABEL_BY_KEY = {
+    subsidiary: 'Subsidiary',
+    group: 'Group',
+    overall_forum: 'Overall — Forum',
+    digital_city: 'Samsung Digital City',
+    meetings: 'Business Meetings',
+    gala: 'Gala Dinner',
+    busan_day: 'Busan Hospitality day',
+    seoul_day: 'Seoul Hospitality day',
+    welcome_dinner: 'Welcome Dinner',
+    busan_lunch: 'Busan Lunch',
+    busan_happy: 'Busan Happy Hour',
+    seoul_lunch: 'Seoul Lunch',
+    seoul_dinner: 'Seoul Dinner',
+    comments: 'Comments',
+    next_when: 'Next Forum — When',
+    next_where: 'Next Forum — Where',
+  };
+
+  // ✅ 유틸 함수
+  function isEmptyValue(v){
+    if (v === undefined || v === null) return true;
+    if (typeof v === 'string' && v.trim() === '') return true;
+    return false;
+  }
+
+  function highlightMissing(keys){
+    keys.forEach(k=>{
+      const likert = document.querySelector(`.likert[data-key="${k}"]`);
+      if(likert){
+        likert.classList.add('ring-2','ring-red-500','rounded-xl');
+        setTimeout(()=>likert.classList.remove('ring-2','ring-red-500'), 1800);
+        return;
+      }
+      const input = document.getElementById(k);
+      if(input){
+        input.classList.add('border-red-500');
+        setTimeout(()=>input.classList.remove('border-red-500'), 1800);
+        return;
+      }
+      const radios = document.querySelectorAll(`.choice[data-name="${k}"]`);
+      if(radios.length){
+        radios.forEach(el=>el.classList.add('ring-2','ring-red-500','rounded-xl'));
+        setTimeout(()=>radios.forEach(el=>el.classList.remove('ring-2','ring-red-500')), 1800);
+      }
+    });
+  }
+
+  function validateStep(stepNum){
+    const required = REQUIRED_KEYS_BY_STEP[stepNum] || [];
+    const missing = required.filter(k => isEmptyValue(state.data[k]));
+    if(missing.length){
+      highlightMissing(missing);
+      const names = missing.map(k=>LABEL_BY_KEY[k] || k).join(', ');
+      alert(`Please complete: ${names}`);
+      return false;
+    }
+    return true;
+  }
+
+  // ------------------------------
+  // Options data (여기는 딱 한 번만!)
   const subsidiaries = [
-    'Argentina, Uruguay, Paraguay', 'Brazil', 'Central America, Caribbean, Miami', 'Chile, Bolivia', 'Colombia', 'Mexico', 'Peru', 'LAO (RHQ)', 'Korea (HQ)'
+    'Argentina, Uruguay, Paraguay', 'Brazil',
+    'Central America, Caribbean, Miami',
+    'Chile, Bolivia', 'Colombia', 'Mexico', 'Peru',
+    'LAO (RHQ)', 'Korea (HQ)'
   ];
   const groups = ['Retailer','Samsung'];
+
 
   // Render subsidiary & group choices
   const asRadio = (name, value) => {
@@ -226,7 +300,7 @@
       for(let i=0;i<=10;i++){
         const b = document.createElement('button');
         b.type = 'button';
-        b.className = 'tap w-full rounded-xl border p-3 text-lg font-semibold bg-white flex items-center justify-center text-center leading-none';
+        b.className = 'tap w-full rounded-xl border p-4 text-2xl font-semibold bg-white flex items-center justify-center text-center leading-none';
         b.textContent = i;
         if(cur===i) b.classList.add('!bg-blue-600','!text-white');
         b.addEventListener('click', ()=>{
@@ -263,17 +337,12 @@
   }
 
   btnPrev.addEventListener('click', ()=> showStep(state.step-1));
-  btnNext.addEventListener('click', ()=>{
-    // simple required check for step 1
-    if(state.step===1){
-      if(!state.data.subsidiary || !state.data.group){
-        alert('Please select subsidiary and group.');
-        return;
-      }
-    }
-    showStep(state.step+1)
-  });
 
+  btnNext.addEventListener('click', ()=>{
+    // 현재 단계 유효성 검사
+    if (!validateStep(state.step)) return;
+    showStep(state.step + 1);
+  });
   btnSave.addEventListener('click', ()=>{
     saveDraft();
     alert('Saved on this device. You can close and come back later.');
@@ -282,9 +351,13 @@
   // Submit handler — Google Sheets (Apps Script Web App)
   form.addEventListener('submit', async (e)=>{
     e.preventDefault();
-    // basic validation
-    if(!state.data.subsidiary || !state.data.group){
-      showStep(1); alert('Please complete required fields.'); return;
+
+    // 모든 단계(1~5) 검사
+    for (let s = 1; s <= 5; s++) {
+      if (!validateStep(s)) {
+        showStep(s); // 미입력 단계로 이동
+        return;
+      }
     }
 
     const payload = {
@@ -305,7 +378,7 @@
         const t = await res.text();
         throw new Error('HTTP '+res.status+' '+t);
       }
-      const json = await res.json(); // {ok:true}
+      const json = await res.json();
       if(!json.ok) throw new Error('Submission failed');
       localStorage.removeItem(LS_KEY);
       toggleLoading(false);
