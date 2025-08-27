@@ -248,10 +248,9 @@
       // window.location.href = 'your_page_2.html';
       alert('Coming soon: Day 1 — Menu B');
     });
-    document.getElementById('day1Opt3Btn').addEventListener('click', () => {
-      // window.location.href = 'your_page_3.html';
-      alert('Coming soon: Day 1 — Menu C');
-    });
+
+    const btn3 = document.getElementById('day1Opt3Btn');
+    if (btn3) btn3.addEventListener('click', ()=>{ alert('Coming soon: Day 1 — Menu C'); });
   </script>
 
 
@@ -467,30 +466,32 @@ function downloadIcs(filename, icsText){
   a.remove();
 }
 
-/* =========================
- * Popover open/close
- * ========================= */
+// =========================
+// Popover open/close (FIXED)
+// =========================
 const $btn = document.getElementById('calBtn');
 const $pop = document.getElementById('calPop');
 
 if ($btn && $pop){
   $btn.addEventListener('click', (e)=>{
     e.stopPropagation();
-    const willOpen = $pop.classList.contains('hidden');
-    $pop.classList.toggle('hidden', !willOpen ? false : true);
-    $btn.setAttribute('aria-expanded', String(willOpen));
+    // 단순 토글로 처리하고, aria-expanded는 토글 후 상태로 맞춤
+    $pop.classList.toggle('hidden');
+    const nowHidden = $pop.classList.contains('hidden');
+    $btn.setAttribute('aria-expanded', String(!nowHidden));
   });
 
   document.addEventListener('click', (e)=>{
-    if(!$pop.classList.contains('hidden')){
-      if(!e.target.closest('#calPop') && !e.target.closest('#calBtn')){
+    if (!$pop.classList.contains('hidden')){
+      if (!e.target.closest('#calPop') && !e.target.closest('#calBtn')){
         $pop.classList.add('hidden');
         $btn.setAttribute('aria-expanded','false');
       }
     }
   });
+
   document.addEventListener('keydown', (e)=>{
-    if(e.key === 'Escape'){
+    if (e.key === 'Escape'){
       $pop.classList.add('hidden');
       $btn.setAttribute('aria-expanded','false');
     }
@@ -513,6 +514,7 @@ if ($btnGCal){
     url.searchParams.set('details', EVENT.description);
     url.searchParams.set('location', EVENT.location);
     window.open(url.toString(), '_blank');
+    if ($pop) $pop.classList.add('hidden');   // ← 추가
   });
 }
 
@@ -535,6 +537,7 @@ if ($btnICS){
       : EVENT.title.replaceAll(' ','_');
 
     downloadIcs(`${baseName}.ics`, ics);
+    if ($pop) $pop.classList.add('hidden');   // ← 추가
   });
 }
 
