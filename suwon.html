@@ -26,17 +26,20 @@
         <div class="text-xs tracking-wide text-slate-500">Day 1 · Suwon</div>
         <h1 class="text-lg font-bold">Samsung Digital City — Visitor Schedule</h1>
 
-        <!-- Group 선택 토글 -->
-        <div class="mt-3 flex items-center gap-2">
-          <div class="inline-flex p-1 rounded-full bg-slate-100 ring-1 ring-slate-200" role="tablist">
-            <button class="gbtn px-3 py-1.5 rounded-full text-sm font-medium" data-g="1">Group 1</button>
-            <button class="gbtn px-3 py-1.5 rounded-full text-sm font-medium" data-g="2">Group 2</button>
-            <button class="gbtn px-3 py-1.5 rounded-full text-sm font-medium" data-g="3">Group 3</button>
-          </div>
-          <div class="ml-auto">
-            <button id="closeDay1" class="px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-100">Close</button>
-          </div>
-        </div>
+    <!-- Group 선택 토글 -->
+    <div class="mt-3 flex items-center gap-2">
+      <div class="inline-flex p-1 rounded-full bg-slate-100 ring-1 ring-slate-200" role="tablist">
+        <button class="gbtn px-3 py-1.5 rounded-full text-sm font-medium"
+                data-g="1" aria-label="Group 1 — SELA & SEM" title="SELA & SEM">Group 1</button>
+        <button class="gbtn px-3 py-1.5 rounded-full text-sm font-medium"
+                data-g="2" aria-label="Group 2 — SEDA & SAMCOL" title="SEDA & SAMCOL">Group 2</button>
+        <button class="gbtn px-3 py-1.5 rounded-full text-sm font-medium"
+                data-g="3" aria-label="Group 3 — SECH & SEPR & SEASA" title="SECH & SEPR & SEASA">Group 3</button>
+      </div>
+      <div class="ml-auto">
+        <button id="closeDay1" class="px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-100">Close</button>
+      </div>
+    </div>
 
         <!-- 오늘 안내 배지 -->
         <div id="todayBadge" class="mt-2 flex flex-wrap gap-2 text-xs"></div>
@@ -82,6 +85,12 @@ const COLORS = {
   MOVE: "bg-slate-200 text-slate-800",
   B2C:  "bg-slate-300 text-slate-900",
   BSS:  "bg-slate-300 text-slate-900",
+};
+
+const GROUP_NAMES = {
+  "1": "SELA & SEM",
+  "2": "SEDA & SAMCOL",
+  "3": "SECH & SEPR & SEASA",
 };
 
 const GROUPS = {
@@ -135,18 +144,28 @@ function setActiveGroupUI(){
 }
 
 function renderBadge(items){
-  const hasSIM = items.some(i=>i.k==="SIM");
-  const simText = hasSIM ? "· SIM guided slot today" : "";
+  const name = GROUP_NAMES[currentG] || "";
   badge.innerHTML = `
     <div class="inline-flex items-center gap-2 px-2 py-1 rounded-full bg-slate-100 ring-1 ring-slate-200">
       <span class="inline-block w-2 h-2 rounded-full bg-slate-800"></span>
-      <span><strong>Selected:</strong> Group ${currentG} ${simText}</span>
+      <span><strong>Selected:</strong> Group ${currentG} — ${name}</span>
     </div>`;
 }
 
+function renderLegend(){
+  const legend = document.getElementById('groupLegend');
+  if (!legend) return;
+  legend.innerHTML = `
+    <span class="${currentG==='1'?'font-semibold text-slate-800':'text-slate-500'}">G1: ${GROUP_NAMES['1']}</span>
+    <span class="mx-2">·</span>
+    <span class="${currentG==='2'?'font-semibold text-slate-800':'text-slate-500'}">G2: ${GROUP_NAMES['2']}</span>
+    <span class="mx-2">·</span>
+    <span class="${currentG==='3'?'font-semibold text-slate-800':'text-slate-500'}">G3: ${GROUP_NAMES['3']}</span>
+  `;
+}
 function renderTimeline(){
   const items = GROUPS[currentG] || [];
-  renderBadge(items);
+  renderBadge(items); renderLegend(); // 🔹 레전드 동기화
   timeline.innerHTML = items.map(i=>{
     const color = COLORS[i.k] || "bg-slate-200 text-slate-900";
     const tag = `<span class="inline-flex items-center px-2 py-0.5 rounded ${color} text-[11px] font-semibold">${i.k}</span>`;
@@ -205,6 +224,7 @@ document.querySelectorAll(".gbtn").forEach(b=>{
     currentG = b.dataset.g;
     localStorage.setItem("day1_group", currentG);
     setActiveGroupUI();
+    renderLegend();   // 🔹 추가
     renderTimeline();
   });
 });
@@ -219,9 +239,9 @@ document.addEventListener("DOMContentLoaded", () => {
     modal.classList.remove("hidden");
     modal.classList.add("flex");
   }
-  // 기본 그룹 UI & 타임라인 렌더
-  if (typeof setActiveGroupUI === "function") setActiveGroupUI();
-  if (typeof renderTimeline === "function") renderTimeline();
+  setActiveGroupUI?.();
+  renderLegend?.();     // 🔹 추가
+  renderTimeline?.();
 });
 
 // (선택) 혹시 남아있을 수 있는 openDay1 핸들러는 안전 가드
@@ -314,4 +334,3 @@ document.getElementById('pdfModal').addEventListener('click', (e) => {
 
 </body>
 </html>
-
