@@ -56,10 +56,41 @@
     <div id="programModal" class="fixed inset-0 z-50 bg-black bg-opacity-60 hidden flex items-center justify-center">
       <div class="bg-white w-11/12 max-w-md rounded-lg p-4 relative">
         <button id="closeModalBtn" class="absolute top-2 right-3 text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
-        <div class="flex items-center gap-2 mb-3 pr-8">
-          <img src="assets/Calendar.svg" alt="Calendar" class="w-7 h-7 shrink-0" />
-          <h2 class="text-lg font-semibold">📅 Full Program</h2>
-        </div>
+        
+        <!-- Header: left icon button + title + popover anchored to the icon -->
+          <div class="relative mb-3 pr-8">
+            <div class="flex items-center gap-2">
+              <!-- clickable icon -->
+              <button id="calBtn"
+                      class="p-1 rounded-lg ring-1 ring-slate-300 hover:bg-slate-50"
+                      aria-haspopup="true" aria-expanded="false" title="Add to calendar">
+                <img src="assets/Calendar.svg" alt="Calendar" class="w-7 h-7 pointer-events-none" />
+              </button>
+              <h2 class="text-lg font-semibold">📅 Full Program</h2>
+            </div>
+
+            <!-- popover menu (opens on icon click) -->
+            <div id="calPop"
+                class="hidden absolute left-0 top-10 z-50 w-72 origin-top-left rounded-xl border bg-white/95 backdrop-blur px-2 py-2 shadow-xl"
+                role="menu" aria-orientation="vertical" aria-labelledby="calBtn">
+              <div class="px-3 pb-2 text-xs font-medium text-slate-500">Add to calendar</div>
+
+              <button id="btnGCal"
+                      class="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-50"
+                      role="menuitem">
+                <span class="inline-block w-5 h-5 rounded bg-slate-900"></span>
+                <span class="text-sm">Open in Google Calendar</span>
+              </button>
+
+              <button id="btnICS"
+                      class="mt-1 w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-50"
+                      role="menuitem">
+                <span class="inline-block w-5 h-5 rounded bg-slate-200"></span>
+                <span class="text-sm">Download .ics (Apple/Outlook)</span>
+              </button>
+            </div>
+          </div>
+
 
         <!-- 언어 선택 -->
         <div class="mb-4">
