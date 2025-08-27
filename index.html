@@ -68,27 +68,6 @@
               </button>
               <h2 class="text-lg font-semibold">📅 Full Program</h2>
             </div>
-
-            <!-- popover menu (opens on icon click) -->
-            <div id="calPop"
-                class="hidden absolute left-0 top-10 z-50 w-72 origin-top-left rounded-xl border bg-white/95 backdrop-blur px-2 py-2 shadow-xl"
-                role="menu" aria-orientation="vertical" aria-labelledby="calBtn">
-              <div class="px-3 pb-2 text-xs font-medium text-slate-500">Add to calendar</div>
-
-              <button id="btnGCal"
-                      class="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-50"
-                      role="menuitem">
-                <span class="inline-block w-5 h-5 rounded bg-slate-900"></span>
-                <span class="text-sm">Open in Google Calendar</span>
-              </button>
-
-              <button id="btnICS"
-                      class="mt-1 w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-50"
-                      role="menuitem">
-                <span class="inline-block w-5 h-5 rounded bg-slate-200"></span>
-                <span class="text-sm">Download .ics (Apple/Outlook)</span>
-              </button>
-            </div>
           </div>
 
 
@@ -351,17 +330,17 @@
     showSlidesByLang(selectedLang);
   });
 </script>
-
 <script>
 "use strict";
 
 /* =========================
- * [1] Single-event defaults (edit these)
+ * [1] 단일 이벤트 (예시) — 필요 시 수정
+ *  - ALL_EVENTS가 없을 때만 사용됨
  * ========================= */
 const EVENT = {
-  title: 'Day 3 — Gala Dinner',
-  location: 'COEX, Seoul',
-  // Input in KST (+09:00); JS converts to UTC(Z)
+  title: 'LATAM CEO CONFERENCE',
+  location: 'Seoul, South korea',
+  // KST(+09:00)로 입력 → JS Date가 UTC(Z)로 변환
   startKst: '2025-10-18T19:00:00+09:00',
   endKst:   '2025-10-18T21:00:00+09:00',
   description: 'Dress code: Smart casual\\nShuttle departs 18:30\\nLink: https://latam-forum.example.com/day3',
@@ -370,31 +349,43 @@ const EVENT = {
 };
 
 /* ===========================================
- * (Optional) [2] Multi-event payload example
- * - If you set window.ALL_EVENTS, the ICS button
- *   will export ALL events in a single .ics file.
- * - Otherwise it exports only EVENT above.
+ * [2] 여러 일정 한 번에 내보내기 (샘플 3개)
+ *  - 아이콘 클릭 시 전체 일정 .ics 다운로드
  * =========================================== */
-// window.ALL_EVENTS = [
-//   {
-//     uid: 'day1-keynote-20251016@latam-forum.example.com',
-//     title: 'Day 1 — Keynote',
-//     location: 'Samsung Digital City, Suwon',
-//     startKst: '2025-10-16T10:00:00+09:00',
-//     endKst:   '2025-10-16T11:00:00+09:00',
-//     description: 'Simultaneous interpretation provided',
-//     alarmMinutes: 10
-//   },
-//   { ...another event... }
-// ];
+window.ALL_EVENTS = [
+  {
+    uid: 'day1-keynote-20251016@latam-forum.example.com',
+    title: 'Day 1 — Keynote: Journey of Inspiration',
+    location: 'Samsung Digital City, Suwon',
+    startKst: '2025-10-16T10:00:00+09:00',
+    endKst:   '2025-10-16T11:00:00+09:00',
+    description: 'Simultaneous interpretation provided\\nShuttle departs 09:15 from hotel\\nLink: https://latam-forum.example.com/sessions/keynote',
+    alarmMinutes: 10
+  },
+  {
+    uid: 'day2-fieldvisit-hyundai-20251017@latam-forum.example.com',
+    title: 'Day 2 — Field Visit: The Hyundai Seoul',
+    location: 'The Hyundai Seoul, Yeouido',
+    startKst: '2025-10-17T09:30:00+09:00',
+    endKst:   '2025-10-17T12:00:00+09:00',
+    description: 'Retail innovation showcase\\nGroup A/B split at entrance\\nLink: https://latam-forum.example.com/field/thehyundai',
+    alarmMinutes: 15
+  },
+  {
+    uid: 'day3-gala-20251018@latam-forum.example.com',
+    title: 'Day 3 — Gala Dinner',
+    location: 'COEX, Seoul',
+    startKst: '2025-10-18T19:00:00+09:00',
+    endKst:   '2025-10-18T21:00:00+09:00',
+    description: 'Dress code: Smart casual\\nShuttle departs 18:30\\nLink: https://latam-forum.example.com/day3',
+    alarmMinutes: 10
+  }
+];
 
 /* =========================
- * Utilities (dates & escape)
+ * [3] 유틸 (날짜 포맷/이스케이프)
  * ========================= */
 function pad2(n){ return String(n).padStart(2,'0'); }
-function toGCalDateZ(d){
-  return `${d.getUTCFullYear()}${pad2(d.getUTCMonth()+1)}${pad2(d.getUTCDate())}T${pad2(d.getUTCHours())}${pad2(d.getUTCMinutes())}${pad2(d.getUTCSeconds())}Z`;
-}
 function toIcsZ(d){
   return `${d.getUTCFullYear()}${pad2(d.getUTCMonth()+1)}${pad2(d.getUTCDate())}T${pad2(d.getUTCHours())}${pad2(d.getUTCMinutes())}${pad2(d.getUTCSeconds())}Z`;
 }
@@ -407,8 +398,7 @@ function icsEscape(s=''){
 }
 
 /* ============================================
- * Build VCALENDAR with one or many VEVENTs
- * - events: array of {uid,title,location,description,startKst,endKst,alarmMinutes}
+ * [4] VCALENDAR 문자열 생성 (멀티 VEVENT 지원)
  * ============================================ */
 function buildIcsCalendar(events){
   const now = new Date();
@@ -423,13 +413,13 @@ function buildIcsCalendar(events){
   const vevents = events.map(ev=>{
     const start = new Date(ev.startKst);
     const end   = new Date(ev.endKst);
-    const lines = [
+    return [
       'BEGIN:VEVENT',
       `UID:${icsEscape(ev.uid)}`,
-      `DTSTAMP:${toIcsZ(now)}`,
-      `DTSTART:${toIcsZ(new Date(start.toISOString()))}`,
-      `DTEND:${toIcsZ(new Date(end.toISOString()))}`,
-      `SUMMARY:${icsEscape(ev.title)}`,
+      `DTSTAMP:${toIcsZ(now)}`,           // 파일 생성 시점(UTC)
+      `DTSTART:${toIcsZ(start)}`,         // 시작(UTC)
+      `DTEND:${toIcsZ(end)}`,             // 종료(UTC)
+      `SUMMARY:${icsEscape(ev.title)}`,   // 제목
       ev.description ? `DESCRIPTION:${icsEscape(ev.description)}` : '',
       ev.location ? `LOCATION:${icsEscape(ev.location)}` : '',
       'STATUS:CONFIRMED',
@@ -441,114 +431,75 @@ function buildIcsCalendar(events){
       'DESCRIPTION:Reminder',
       'END:VALARM',
       'END:VEVENT'
-    ].filter(Boolean);
-    return lines.join('\r\n');
+    ].filter(Boolean).join('\r\n');
   });
 
-  return [...header, ...vevents, 'END:VCALENDAR'].join('\r\n'); // CRLF recommended
+  return [...header, ...vevents, 'END:VCALENDAR'].join('\r\n'); // CRLF 권장
 }
 
 /* =========================
- * Download helper (forces save)
- * - Works on Android (Galaxy) Chrome:
- *   goes to “My Files > Downloads”.
- *   Browsers cannot silently save without a user gesture.
+ * [5] 파일 저장 (Android/iOS/PC 공통)
+ * - Android: Downloads로 저장
+ * - iOS: 미리보기/공유 시트 → "캘린더에 추가"
  * ========================= */
-function downloadIcs(filename, icsText){
+function saveIcs(filename, icsText){
   const blob = new Blob([icsText], { type: 'text/calendar;charset=utf-8' });
   const url = URL.createObjectURL(blob);
+
+  // iOS Safari 호환: download 속성을 무시할 수 있으므로 location.href로 열기
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  if (isIOS){
+    // 사용자 제스처 내에서 location 변경 → 미리보기 후 "캘린더에 추가"
+    window.location.href = url;
+    setTimeout(()=>URL.revokeObjectURL(url), 15000);
+    return;
+  }
+
+  // 그 외 브라우저: a[download]로 직접 저장
   const a = document.createElement('a');
   a.href = url;
   a.download = filename.endsWith('.ics') ? filename : filename + '.ics';
   document.body.appendChild(a);
-  a.click(); // user-initiated -> direct download
+  a.click();
   URL.revokeObjectURL(url);
   a.remove();
 }
 
-// =========================
-// Popover open/close (FIXED)
-// =========================
-const $btn = document.getElementById('calBtn');
-const $pop = document.getElementById('calPop');
-
-if ($btn && $pop){
-  $btn.addEventListener('click', (e)=>{
-    e.stopPropagation();
-    // 단순 토글로 처리하고, aria-expanded는 토글 후 상태로 맞춤
-    $pop.classList.toggle('hidden');
-    const nowHidden = $pop.classList.contains('hidden');
-    $btn.setAttribute('aria-expanded', String(!nowHidden));
-  });
-
-  document.addEventListener('click', (e)=>{
-    if (!$pop.classList.contains('hidden')){
-      if (!e.target.closest('#calPop') && !e.target.closest('#calBtn')){
-        $pop.classList.add('hidden');
-        $btn.setAttribute('aria-expanded','false');
-      }
-    }
-  });
-
-  document.addEventListener('keydown', (e)=>{
-    if (e.key === 'Escape'){
-      $pop.classList.add('hidden');
-      $btn.setAttribute('aria-expanded','false');
-    }
-  });
-}
-
 /* =========================
- * [Open in Google Calendar]
+ * [6] 아이콘 클릭 → 즉시 .ICS 저장
  * ========================= */
-const $btnGCal = document.getElementById('btnGCal');
-if ($btnGCal){
-  $btnGCal.addEventListener('click', ()=>{
-    const start = new Date(EVENT.startKst);
-    const end   = new Date(EVENT.endKst);
-    const dates = `${toGCalDateZ(start)}/${toGCalDateZ(end)}`;
-    const url = new URL('https://calendar.google.com/calendar/render');
-    url.searchParams.set('action','TEMPLATE');
-    url.searchParams.set('text', EVENT.title);
-    url.searchParams.set('dates', dates);
-    url.searchParams.set('details', EVENT.description);
-    url.searchParams.set('location', EVENT.location);
-    window.open(url.toString(), '_blank');
-    if ($pop) $pop.classList.add('hidden');   // ← 추가
-  });
-}
-
-/* ============================================
- * [.ics download]
- * - If window.ALL_EVENTS exists and has length,
- *   export ALL of them in a single .ics.
- * - Else export the single EVENT above.
- * ============================================ */
-const $btnICS = document.getElementById('btnICS');
-if ($btnICS){
-  $btnICS.addEventListener('click', ()=>{
+const $calBtn = document.getElementById('calBtn');
+if ($calBtn){
+  $calBtn.addEventListener('click', ()=>{
+    // 1) 내보낼 이벤트 집합 구성
     const list = Array.isArray(window.ALL_EVENTS) && window.ALL_EVENTS.length
       ? window.ALL_EVENTS
       : [EVENT];
 
+    // 2) ICS 문자열 생성
     const ics = buildIcsCalendar(list);
+
+    // 3) 파일명 구성
     const baseName = (list.length > 1)
       ? 'LATAM_Forum_Schedule'
       : EVENT.title.replaceAll(' ','_');
 
-    downloadIcs(`${baseName}.ics`, ics);
-    if ($pop) $pop.classList.add('hidden');   // ← 추가
+    // 4) 저장/열기
+    saveIcs(`${baseName}.ics`, ics);
+
+    // 5) (선택) 모달 닫기 및 하단 버튼 복원
+    const modal = document.getElementById('programModal');
+    if (modal) modal.classList.add('hidden');
+    const floatingButtons = document.getElementById('floatingButtons');
+    if (floatingButtons) floatingButtons.classList.remove('hidden');
   });
 }
 
 /* =========================
- * NOTE on Android (Galaxy)
- * - Browsers cannot save files silently to arbitrary folders
- *   for security reasons. The code above triggers a standard
- *   download to the default “Downloads” directory without
- *   extra prompts in most cases.
- * - If you want a one-tap “add to Google Calendar” with no file,
- *   keep the Google button above; it opens the event directly.
+ * [참고/권장]
+ * - 팝오버(#calPop)와 내부 버튼(#btnGCal, #btnICS)은 사용 안 함 → HTML에서 제거 가능
+ * - 자동 업데이트가 필요하면 webcal 구독 별도 제공(이번 요구사항 제외)
+ * - 이벤트 시간은 KST로 입력, ICS에는 UTC로 기록되어 수신자 로컬 시간으로 표시
  * ========================= */
 </script>
 
