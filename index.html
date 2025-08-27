@@ -220,7 +220,45 @@
     });
   </script>
 
+<!-- 📅 Calendar quick add (Day 3) — Day1~3 박스 아래 & 하단 버튼 위 -->
+<div class="w-full max-w-sm mx-auto mt-2 mb-3">
+  <div class="relative flex justify-end">
+    <!-- 아이콘 버튼 -->
+    <button id="calIconBtn"
+            class="p-2 rounded-lg ring-1 ring-slate-300 hover:bg-slate-50"
+            aria-haspopup="true" aria-expanded="false" aria-label="Add to Calendar">
+      <img src="assets/Calendar.svg" alt="Calendar" class="w-7 h-7 pointer-events-none" />
+    </button>
 
+    <!-- 팝업 -->
+    <div id="calPopover"
+         class="hidden absolute top-12 right-0 z-[60] w-72 origin-top-right rounded-xl border bg-white/95 backdrop-blur px-2 py-2 shadow-xl"
+         role="menu" aria-orientation="vertical" aria-labelledby="calIconBtn">
+      <div class="px-3 pb-2 text-xs font-medium text-slate-500">캘린더에 추가</div>
+
+      <!-- Google 캘린더 열기 -->
+      <button id="btnGCal" class="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-50" role="menuitem">
+        <span class="inline-block w-5 h-5 rounded bg-slate-900"></span>
+        <span class="text-sm">Google 캘린더로 열기</span>
+      </button>
+
+      <!-- Apple/Outlook(.ics) 다운로드 -->
+      <button id="btnICS" class="mt-1 w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-50" role="menuitem">
+        <span class="inline-block w-5 h-5 rounded bg-slate-200"></span>
+        <span class="text-sm">Apple/Outlook용 .ics 다운로드</span>
+      </button>
+
+      <!-- 전체 일정 구독(webcal) -->
+      <a id="btnWebcal"
+         href="webcal://latam-forum.example.com/schedule.ics"
+         class="mt-1 w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-50"
+         role="menuitem">
+        <span class="inline-block w-5 h-5 rounded bg-slate-200"></span>
+        <span class="text-sm">전체 일정 구독 (webcal)</span>
+      </a>
+    </div>
+  </div>
+</div>
 
 <!-- ✅ 고정 하단 버튼 그룹 (환율 + SOS) -->
 <div id="floatingButtons"
@@ -318,7 +356,133 @@
     showSlidesByLang(selectedLang);
   });
 </script>
-  
+
+<script>
+// ====== [세션 정보] 필요 시 제목/시간만 바꾸면 재사용 끝 ======
+const CAL_EVENT = {
+  title: 'Day 3 — Gala Dinner',
+  location: 'COEX, Seoul',
+  // 서울시간으로 입력(자동 UTC 변환)
+  startKst: '2025-10-18T19:00:00+09:00',
+  endKst:   '2025-10-18T21:00:00+09:00',
+  description: 'Dress code: Smart casual\\nShuttle departs 18:30\\nLink: https://latam-forum.example.com/day3',
+  uid: 'day3-gala-20251018@latam-forum.example.com'
+};
+
+// ====== 팝업 열고 닫기 ======
+const $calBtn  = document.getElementById('calIconBtn');
+const $calPop  = document.getElementById('calPopover');
+
+$calBtn.addEventListener('click', (e)=>{
+  e.stopPropagation();
+  const willOpen = $calPop.classList.contains('hidden');
+  $calPop.classList.toggle('hidden', !willOpen);
+  $calBtn.setAttribute('aria-expanded', String(willOpen));
+});
+document.addEventListener('click', (e)=>{
+  if(!$calPop.classList.contains('hidden')){
+    if(!e.target.closest('#calPopover') && !e.target.closest('#calIconBtn')){
+      $calPop.classList.add('hidden');
+      $calBtn.setAttribute('aria-expanded','false');
+    }
+  }
+});
+document.addEventListener('keydown', (e)=>{
+  if(e.key === 'Escape'){
+    $calPop.classList.add('hidden');
+    $calBtn.setAttribute('aria-expanded','false');
+  }
+});
+
+// ====== Google 캘린더 열기 ======
+function cal_toGCalDateZ(d){
+  const pad = n => String(n).padStart(2,'0');
+  return `${d.getUTCFullYear()}${pad(d.getUTCMonth()+1)}${pad(d.getUTCDate())}T${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}${pad(d.getUTCSeconds())}Z`;
+}
+document.getElementById('btnGCal').addEventListener('click', ()=>{
+  const start = new Date(CAL_EVENT.startKst);
+  const end   = new Date(CAL_EVENT.endKst);
+  const dates = `${cal_toGCalDateZ(start)}/${cal_toGCalDateZ(end)}`;
+
+  const url = new URL('https://calendar.google.com/calendar/render');
+  url.searchParams.set('action','TEMPLATE');
+  url.searchParams.set('text', CAL_EVENT.title);
+  url.searchParams.set('dates', dates);
+  url.searchParams.set('details', CAL_EVENT.description);
+  url.searchParams.set('location', CAL_EVENT.location);
+
+  window.open(url.toString(), '_blank');
+});
+
+// ====== .ics 다운로드 ======
+function cal_icsEscape(s=''){
+  return String(s)
+    .replaceAll('\\','\\\\')
+    .replaceAll('\n','\\n')
+    .replaceAll(',','\\,')
+    .replaceAll(';','\\;');
+}
+function cal_toIcsZ(d){
+  const pad = n=> String(n).padStart(2,'0');
+  return `${d.getUTCFullYear()}${pad(d.getUTCMonth()+1)}${pad(d.getUTCDate())}T${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}${pad(d.getUTCSeconds())}Z`;
+}
+function cal_buildIcsEvent({uid, summary, description, location, startUtc, endUtc, alarmMinutes=10}){
+  const lines = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//LATAM Forum//Schedule//EN',
+    'CALSCALE:GREGORIAN',
+    'METHOD:PUBLISH',
+    'BEGIN:VEVENT',
+    `UID:${cal_icsEscape(uid)}`,
+    `DTSTAMP:${cal_toIcsZ(new Date())}`,
+    `DTSTART:${cal_toIcsZ(new Date(startUtc))}`,
+    `DTEND:${cal_toIcsZ(new Date(endUtc))}`,
+    `SUMMARY:${cal_icsEscape(summary)}`,
+    description ? `DESCRIPTION:${cal_icsEscape(description)}` : '',
+    location ? `LOCATION:${cal_icsEscape(location)}` : '',
+    'STATUS:CONFIRMED',
+    'SEQUENCE:0',
+    'TRANSP:OPAQUE',
+    'BEGIN:VALARM',
+    'TRIGGER:-PT10M',
+    'ACTION:DISPLAY',
+    'DESCRIPTION:Reminder',
+    'END:VALARM',
+    'END:VEVENT',
+    'END:VCALENDAR'
+  ].filter(Boolean);
+  return lines.join('\r\n'); // CRLF 권장
+}
+function cal_downloadIcs(filename, icsText){
+  const blob = new Blob([icsText], { type: 'text/calendar;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename.endsWith('.ics') ? filename : filename + '.ics';
+  document.body.appendChild(a);
+  a.click();
+  URL.revokeObjectURL(url);
+  a.remove();
+}
+
+document.getElementById('btnICS').addEventListener('click', ()=>{
+  const start = new Date(CAL_EVENT.startKst);
+  const end   = new Date(CAL_EVENT.endKst);
+  const ics = cal_buildIcsEvent({
+    uid: CAL_EVENT.uid,
+    summary: CAL_EVENT.title,
+    description: CAL_EVENT.description,
+    location: CAL_EVENT.location,
+    startUtc: start.toISOString(),
+    endUtc: end.toISOString(),
+    alarmMinutes: 10
+  });
+  cal_downloadIcs(`${CAL_EVENT.title.replaceAll(' ','_')}.ics`, ics);
+});
+</script>
+
+
 </body>
 
 </html>
