@@ -18,7 +18,7 @@
     <header class="mb-4 sm:mb-6">
       <h1 class="text-3xl sm:text-4xl font-bold mt-3 mb-4">Survey</h1>
       <p class="text-lg leading-7 text-slate-800">
-        We hope you had a great time at <span class="font-semibold">Journy of Inspiration</span>.
+        We hope you had a great time at <span class="font-semibold">Journey of Inspiration</span>.
       </p>
       <p class="text-lg leading-7 text-slate-700">
         Please complete the survey by selecting your answers. For rating questions, <span class="font-semibold">tap a number (0–10)</span>; for text questions, type your comments. <span class="text-slate-500">(On mobile, just tap to select.)</span>
@@ -62,7 +62,7 @@
         <p class="text-slate-600 mb-4">Tap a number (0–10). Bigger = better.</p>
         <div class="space-y-6">
           <div>
-            <label class="block font-semibold mb-2 text-xl sm:text-2xl">Journy of Inspiration — LATIN CEO CONFERENCE</label>
+            <label class="block font-semibold mb-2 text-xl sm:text-2xl">Journey of Inspiration — LATIN CEO CONFERENCE</label>
             <div class="likert" data-key="overall_forum"></div>
           </div>
           <div>
@@ -152,7 +152,7 @@
       <p id="helper" class="text-center text-slate-600 text-sm">You can come back later. Your progress is saved on this device.</p>
     </form>
 
-    <footer class="text-center text-xs text-slate-500 mt-6">Journy of Inspiration</footer>
+    <footer class="text-center text-xs text-slate-500 mt-6">Journey of Inspiration</footer>
   </main>
 
   <script>
@@ -160,7 +160,10 @@
    * 0) APPS SCRIPT ENDPOINT (Google Sheets Web App)
    ********************/
     const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyuDzWQL_T704mWcI8H-jGahS3XHBRZMpIK2aPIUKWmb3l8YTvIu6fcpTnwGrXA6UPkOQ/exec';
-    const SHARED_SECRET = 'CHANGE_THIS_TO_A_RANDOM_SECRET'; // GAS 코드의 SHARED_SECRET와 반드시 동일
+    const SHARED_SECRET = 'LATAM2025_SECRET_987xyz'; // GAS 코드의 SHARED_SECRET와 반드시 동일
+    // —— 로컬스토리지 키들 ——
+    const LS_PENDING_KEY   = 'survey_pending_payload_v1';  // 제출 실패 시 임시보관 페이로드
+    const LS_SUBMIT_ID_KEY = 'survey_submit_id_v1';        // 이번 제출의 UUID(성공 시 삭제)
 
 
   /********************
@@ -185,7 +188,7 @@
     2: ['overall_forum','digital_city','meetings','gala'],
     3: ['busan_day','seoul_day'],
     4: ['welcome_dinner','busan_lunch','busan_happy','seoul_lunch','seoul_dinner'],
-    5: ['comments','next_when','next_where'],
+    5: [],
   };
 
   const LABEL_BY_KEY = {
@@ -206,6 +209,57 @@
     next_when: 'Next Forum — When',
     next_where: 'Next Forum — Where',
   };
+
+  // —— UUID 생성 (브라우저가 지원하면 crypto.randomUUID 사용) ——
+    function uuid() {
+      if (crypto.randomUUID) return crypto.randomUUID();
+      return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(
+        /[018]/g,
+        c => (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c/4).toString(16)
+      );
+    }
+
+    // —— 제출용 UUID를 만들고 보관/재사용 ——
+    // (성공할 때까지 같은 ID 재사용 → 서버에서 중복 저장 방지)
+    function getOrCreateSubmitId() {
+      let id = localStorage.getItem(LS_SUBMIT_ID_KEY);
+      if (!id) {
+        id = uuid();
+        localStorage.setItem(LS_SUBMIT_ID_KEY, id);
+      }
+      return id;
+    }
+    function clearSubmitId() {
+      localStorage.removeItem(LS_SUBMIT_ID_KEY);
+    }
+
+    // —— 지수 백오프 재시도: 5xx/네트워크 오류만 재시도, 4xx는 즉시 실패 ——
+    // tries: 시도 횟수, baseDelay: 최초 대기(ms). 각 회마다 x2 + 랜덤 지터
+    async function postJSON(url, body, tries = 3, baseDelay = 500) {
+      for (let i = 0; i < tries; i++) {
+        try {
+          const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(body),
+          });
+          if (res.ok) return res.json();
+
+          // 5xx는 재시도 대상
+          if (res.status >= 500) throw new Error('server ' + res.status);
+
+          // 4xx는 즉시 실패(재시도 무의미)
+          const t = await res.text();
+          throw new Error('HTTP ' + res.status + ' ' + t);
+
+        } catch (err) {
+          if (i === tries - 1) throw err;
+          const jitter = Math.floor(Math.random() * 150); // 0~149ms 지터
+          await new Promise(r => setTimeout(r, baseDelay * Math.pow(2, i) + jitter));
+        }
+      }
+    }
+
 
   // ✅ 유틸 함수
   function isEmptyValue(v){
@@ -352,7 +406,7 @@
   });
 
   // Submit handler — Google Sheets (Apps Script Web App)
-  form.addEventListener('submit', async (e)=>{
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     // 모든 단계(1~5) 검사
@@ -363,37 +417,44 @@
       }
     }
 
+    // —— 이번 제출의 UUID(멱등 키) 확보 —— 
+    const submitId = getOrCreateSubmitId();
+
+    // —— 페이로드 구성 + 먼저 로컬에 보관(오프라인/실패 대비) ——
     const payload = {
+      id: submitId,                                // ★ 서버로도 전송됨(중복 방지)
       ...state.data,
       created_at: new Date().toISOString(),
       user_agent: navigator.userAgent,
       _secret: SHARED_SECRET
     };
+    localStorage.setItem(LS_PENDING_KEY, JSON.stringify(payload));
 
     toggleLoading(true);
-    try{
-      const res = await fetch(APPS_SCRIPT_URL, {
-        method: 'POST',
-        // 🔽 preflight 안 생기게 단순 요청으로
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload),
-      });
-      if(!res.ok){
-        const t = await res.text();
-        throw new Error('HTTP '+res.status+' '+t);
-      }
-      const json = await res.json();
-      if(!json.ok) throw new Error('Submission failed');
-      localStorage.removeItem(LS_KEY);
+    try {
+      // —— 지수 백오프 재시도 사용 —— 
+      const json = await postJSON(APPS_SCRIPT_URL, payload, /*tries*/3, /*baseDelay*/500);
+      if (!json.ok) throw new Error('Submission failed');
+
+      // —— 성공: 모든 로컬 데이터 정리 —— 
+      localStorage.removeItem(LS_KEY);         // 작성 중 임시저장
+      localStorage.removeItem(LS_PENDING_KEY); // 실패 보관 페이로드
+      clearSubmitId();                         // 이번 제출 UUID 제거
+
       toggleLoading(false);
       alert('Thank you! Your response has been submitted.');
       window.location.assign('thankyou.html');
-    }catch(err){
+
+    } catch (err) {
       toggleLoading(false);
       console.error(err);
-      alert('Submission failed. Please check your connection and try again.');
+
+      // —— 실패: 페이로드는 이미 LS_PENDING_KEY에 보관됨 —— 
+      // 다음에 페이지를 다시 열거나, Submit을 다시 누르면 postJSON으로 재시도됩니다.
+      alert('Network or server issue.\nYour response is saved on this device and will retry automatically next time you open this page or press Submit again.');
     }
   });
+
 
   function toggleLoading(on){
     [btnPrev,btnNext,btnSubmit,btnSave].forEach(b=> b.disabled = !!on);
@@ -403,12 +464,42 @@
   function saveDraft(){ localStorage.setItem(LS_KEY, JSON.stringify(state)); }
   function loadDraft(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)); }catch{ return null; } }
 
+
+  // —— 부팅 시, 로컬에 실패 저장된 응답이 있으면 자동 재전송(1회) ——
+    async function tryResendPending() {
+      const raw = localStorage.getItem(LS_PENDING_KEY);
+      if (!raw) return; // 실패 보관 데이터 없으면 아무것도 안 함
+
+      try {
+        const payload = JSON.parse(raw);
+        const json = await postJSON(APPS_SCRIPT_URL, payload, /*tries*/3, /*baseDelay*/500);
+        if (json && json.ok) {
+          // 성공 시: 로컬 정리
+          localStorage.removeItem(LS_KEY);
+          localStorage.removeItem(LS_PENDING_KEY);
+          clearSubmitId();
+
+          // 사용자 안내 + 완료 페이지 이동
+          alert('Your previously saved response has been submitted. Thank you!');
+          window.location.assign('thankyou.html');
+        }
+      } catch (e) {
+        // 조용히 실패: 네트워크가 아직 불안정하면 사용자 Submit 시 다시 재시도됨
+        console.warn('Auto-resend failed:', e);
+      }
+    }
+
+
   // Boot
   restoreRadios();
   renderLikerts();
   // restore text
   ['comments','next_when','next_where'].forEach(id=>{ const v = state.data[id]; if(v) document.getElementById(id).value = v; });
   showStep(state.step||1);
+
+  // ★ 자동 재전송 시도(있으면 1회만)
+  tryResendPending();
+
   </script>
 
   <!--
