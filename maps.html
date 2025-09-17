@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>경로 안내 (São Paulo)</title>
+  <title>Maps (Seoul)</title>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="https://cdn.tailwindcss.com"></script>
@@ -16,16 +16,20 @@
   <!-- 🔙 상단 뒤로가기 + 제목 -->
   <div class="flex items-center justify-between max-w-md mx-auto mb-4">
     <button onclick="goHome()" class="text-sm text-blue-600 hover:underline">← Back</button>
-    <h1 class="text-xl font-bold text-center flex-1 -ml-6">📍 목적지 선택</h1>
+    <h1 class="text-xl font-bold text-center flex-1 -ml-6">📍 Maps</h1>
   </div>
 
   <!-- 목적지 버튼 -->
-  <div class="grid grid-cols-2 gap-4 mb-4 max-w-md mx-auto">
-    <button onclick="routeTo('museu')" class="bg-white py-2 px-4 rounded shadow hover:bg-gray-200">🏛️ Museu do Ipiranga</button>
-    <button onclick="routeTo('paulista')" class="bg-white py-2 px-4 rounded shadow hover:bg-gray-200">🏙️ Av. Paulista</button>
-    <button onclick="routeTo('ibirapuera')" class="bg-white py-2 px-4 rounded shadow hover:bg-gray-200">🌳 Ibirapuera Park</button>
-    <button onclick="routeTo('mercado')" class="bg-white py-2 px-4 rounded shadow hover:bg-gray-200">🛍️ Mercado Municipal</button>
-  </div>
+<div class="grid grid-cols-2 gap-4 mb-4 max-w-md mx-auto">
+  <button onclick="routeTo('shilla')" class="bg-white py-2 px-4 rounded shadow hover:bg-gray-200">🏨 The Shilla Seoul</button>
+  <button onclick="routeTo('digitalcity')" class="bg-white py-2 px-4 rounded shadow hover:bg-gray-200">🏢 Samsung Digital City</button>
+  <button onclick="routeTo('umyeonrnd')" class="bg-white py-2 px-4 rounded shadow hover:bg-gray-200">🏢 Umyeon R&amp;D Campus</button>
+  <button onclick="routeTo('hyundae')" class="bg-white py-2 px-4 rounded shadow hover:bg-gray-200">🛍️ The Hyundai Seoul</button>
+  <button onclick="routeTo('housenowhere')" class="bg-white py-2 px-4 rounded shadow hover:bg-gray-200">🧱 House Nowhere Seoul</button>
+</div>
+
+
+
 
   <!-- 거리, 시간 안내 -->
   <div id="routeInfo" class="text-center text-sm text-gray-700 mt-2 mb-4 whitespace-pre-line"></div>
@@ -34,12 +38,14 @@
   <div id="map" class="rounded shadow"></div>
 
   <script>
-    const destinations = {
-      museu: { lat: -23.5854, lng: -46.6237 },
-      paulista: { lat: -23.5614, lng: -46.6559 },
-      ibirapuera: { lat: -23.5874, lng: -46.6576 },
-      mercado: { lat: -23.5411, lng: -46.6275 }
+const destinations = {
+    shilla:      { lat: 37.555890, lng: 127.005150 }, // 신라호텔 (장충동)
+    digitalcity: { lat: 37.256910, lng: 127.051260 }, // 수원 디지털 시티 (수원 삼성)
+    umyeonrnd:   { lat: 37.466383, lng: 127.023000 }, // 우면 R&D 캠퍼스 (서울 R&D)
+    hyundae:     { lat: 37.525960, lng: 126.928420 }, // 더현대 서울 (여의도)
+    housenowhere:{ lat: 37.537973, lng: 127.058702 }  // 하우스 노웨어 서울 (성수)
     };
+
 
     let map, directionsService, directionsRenderer;
     const routeInfoDiv = document.getElementById("routeInfo");
@@ -47,7 +53,7 @@
     function initMap() {
       map = new google.maps.Map(document.getElementById("map"), {
         zoom: 13,
-        center: { lat: -23.55, lng: -46.63 },
+            center: { lat: 37.5665, lng: 126.9780 }, // 서울 시청 부근
       });
 
       directionsService = new google.maps.DirectionsService();
