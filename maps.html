@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>경로 안내 (Seoul)</title>
+  <title>Maps (Seoul)</title>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="https://cdn.tailwindcss.com"></script>
@@ -18,14 +18,14 @@
 
   <!-- 목적지 버튼 -->
   <div class="grid grid-cols-2 gap-4 mb-4 max-w-md mx-auto">
-    <button onclick="routeTo('shilla')" class="bg-white py-2 px-4 rounded shadow hover:bg-gray-200">🏨 The Shilla Seoul</button>
-    <button onclick="routeTo('digitalcity')" class="bg-white py-2 px-4 rounded shadow hover:bg-gray-200">🏢 Samsung Digital City</button>
-    <button onclick="routeTo('umyeonrnd')" class="bg-white py-2 px-4 rounded shadow hover:bg-gray-200">🧪 Umyeon R&amp;D Campus</button>
-    <button onclick="routeTo('hyundae')" class="bg-white py-2 px-4 rounded shadow hover:bg-gray-200">🛍️ The Hyundai Seoul</button>
-    <button onclick="routeTo('housenowhere')" class="bg-white py-2 px-4 rounded shadow hover:bg-gray-200">🧱 House Nowhere Seoul</button>
+    <button onclick="focusDest('shilla')" class="bg-white py-2 px-4 rounded shadow hover:bg-gray-200">🏨 The Shilla Seoul</button>
+    <button onclick="focusDest('digitalcity')" class="bg-white py-2 px-4 rounded shadow hover:bg-gray-200">🏢 Samsung Digital City</button>
+    <button onclick="focusDest('umyeonrnd')" class="bg-white py-2 px-4 rounded shadow hover:bg-gray-200">🧪 Umyeon R&amp;D Campus</button>
+    <button onclick="focusDest('hyundae')" class="bg-white py-2 px-4 rounded shadow hover:bg-gray-200">🛍️ The Hyundai Seoul</button>
+    <button onclick="focusDest('housenowhere')" class="bg-white py-2 px-4 rounded shadow hover:bg-gray-200">🧱 House Nowhere Seoul</button>
   </div>
 
-  <!-- 거리, 시간 안내 -->
+  <!-- 정보 표기 -->
   <div id="routeInfo" class="text-center text-sm text-gray-700 mt-2 mb-4 whitespace-pre-line"></div>
 
   <!-- 지도 -->
@@ -34,32 +34,19 @@
   <script>
     // ✅ 목적지 좌표
     const destinations = {
-      shilla:      { lat: 37.555890, lng: 127.005150 }, // The Shilla Seoul
-      digitalcity: { lat: 37.256910, lng: 127.051260 }, // Samsung Digital City (Suwon)
-      umyeonrnd:   { lat: 37.465110, lng: 127.023470 }, // Umyeon R&D Campus (보정)
-      hyundae:     { lat: 37.525960, lng: 126.928420 }, // The Hyundai Seoul (Yeouido)
-      housenowhere:{ lat: 37.537973, lng: 127.058702 }  // House Nowhere Seoul (Seongsu)
+      shilla:      { lat: 37.555890, lng: 127.005150, name: "The Shilla Seoul" },
+      digitalcity: { lat: 37.256910, lng: 127.051260, name: "Samsung Digital City (Suwon)" },
+      umyeonrnd:   { lat: 37.465110, lng: 127.023470, name: "Umyeon R&D Campus" },
+      hyundae:     { lat: 37.525960, lng: 126.928420, name: "The Hyundai Seoul (Yeouido)" },
+      housenowhere:{ lat: 37.537973, lng: 127.058702, name: "House Nowhere Seoul (Seongsu)" }
     };
 
-    // ✅ 위치 실패 대비 기본 출발지 & Geolocation 옵션
-    const DEFAULT_ORIGIN = destinations.shilla;
-    const GEO_OPTIONS = { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 };
-
-    let map, directionsService, directionsRenderer, distanceService, fallbackLine = null;
+    let map, infoWindow;
+    let myPos = null;            // {lat, lng} or null
+    const destMarkers = {};      // key -> Marker
     const routeInfoDiv = document.getElementById("routeInfo");
 
-    function initMap() {
-      map = new google.maps.Map(document.getElementById("map"), {
-        zoom: 13,
-        center: { lat: 37.5665, lng: 126.9780 }, // 서울 시청 부근
-      });
-      directionsService  = new google.maps.DirectionsService();
-      directionsRenderer = new google.maps.DirectionsRenderer();
-      directionsRenderer.setMap(map);
-      distanceService    = new google.maps.DistanceMatrixService();
-    }
-
-    // 📐 Haversine 거리(m)
+    // 📐 Haversine 직선거리(m)
     function haversine(a, b){
       const R = 6371000; // m
       const toRad = d => d * Math.PI / 180;
@@ -69,84 +56,85 @@
       const h = Math.sin(dLat/2)**2 + Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLng/2)**2;
       return 2*R*Math.asin(Math.sqrt(h));
     }
-    const fmtKm = (m)=> `${(m/1000).toFixed(1)} km`;
-    const estWalkSec = (m)=> Math.round(m / 1.33); // 1.33 m/s ≈ 4.8 km/h
-    function fmtDur(sec){
-      const h = Math.floor(sec/3600), m = Math.round((sec%3600)/60);
-      return h ? `${h}h ${m}m` : `${m} min`;
+    const fmtKm = (m)=> (m < 1000 ? `${Math.round(m)} m` : `${(m/1000).toFixed(1)} km`);
+
+    function initMap() {
+      map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 13,
+        center: { lat: 37.5665, lng: 126.9780 } // 서울 시청 부근
+      });
+      infoWindow = new google.maps.InfoWindow();
+
+      // 목적지 마커 찍기
+      Object.entries(destinations).forEach(([key, d]) => {
+        const marker = new google.maps.Marker({
+          position: d,
+          map,
+          title: d.name
+        });
+        marker.addListener('click', () => openDestInfo(key));
+        destMarkers[key] = marker;
+      });
+
+      // 내 위치 마커 (권한 허용 시에만)
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            myPos = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+            new google.maps.Marker({
+              position: myPos,
+              map,
+              title: "You are here",
+              icon: {
+                path: google.maps.SymbolPath.CIRCLE,
+                scale: 8,
+                fillColor: "#4285F4",
+                fillOpacity: 1,
+                strokeColor: "#ffffff",
+                strokeWeight: 2
+              }
+            });
+            fitAllMarkers();
+            routeInfoDiv.innerText = "Showing your current location and selected destinations.";
+          },
+          (err) => {
+            console.warn("Geolocation error:", err);
+            fitAllMarkers(); // 내 위치 없이 목적지만 보기
+            routeInfoDiv.innerText = "Location access denied. Showing destinations only.";
+          },
+          { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
+        );
+      } else {
+        fitAllMarkers();
+        routeInfoDiv.innerText = "Geolocation not supported. Showing destinations only.";
+      }
     }
 
-    function clearOverlays(){
-      directionsRenderer.setMap(null);
-      directionsRenderer = new google.maps.DirectionsRenderer();
-      directionsRenderer.setMap(map);
-      if (fallbackLine){ fallbackLine.setMap(null); fallbackLine = null; }
-    }
-
-    function fitBounds(a, b){
+    function fitAllMarkers(){
       const bounds = new google.maps.LatLngBounds();
-      bounds.extend(a); bounds.extend(b);
+      Object.values(destMarkers).forEach(m => bounds.extend(m.getPosition()));
+      if (myPos) bounds.extend(myPos);
       map.fitBounds(bounds, 64);
     }
 
-    // ✅ 경로 요청: 도보 우선. ZERO_RESULTS 등일 때 직선거리로 안내 + 대체 폴리라인 표시.
-    function routeTo(key) {
-      const destination = destinations[key];
-
-      const requestAll = (origin) => {
-        clearOverlays();
-
-        // 1) 도보 Distance Matrix (시간/거리 먼저 계산)
-        distanceService.getDistanceMatrix({
-          origins: [origin],
-          destinations: [destination],
-          travelMode: google.maps.TravelMode.WALKING
-        }, (res, status) => {
-          let topLine = "", subLine = "";
-
-          if (status === "OK" && res.rows[0].elements[0].status === "OK") {
-            const el = res.rows[0].elements[0];
-            topLine = `🚶 From your location → Destination`;
-            subLine = `⏱️ ${el.duration.text} (${el.distance.text})`;
-          } else {
-            // 거리/시간 못 받으면 Haversine로 근사
-            const m = haversine(origin, destination);
-            topLine = `🚶 (Approx.) From your location → Destination`;
-            subLine = `⏱️ ~${fmtDur(estWalkSec(m))} (${fmtKm(m)})`;
-          }
-          routeInfoDiv.innerText = `${topLine}\n${subLine}`;
-        });
-
-        // 2) 도보 Directions (실제 경로 그리기)
-        directionsService.route(
-          { origin, destination, travelMode: google.maps.TravelMode.WALKING },
-          (response, status) => {
-            if (status === "OK") {
-              directionsRenderer.setDirections(response);
-            } else {
-              // ZERO_RESULTS 등 → 직선 폴리라인으로 대체 표기
-              fallbackLine = new google.maps.Polyline({
-                path: [origin, destination],
-                map,
-                strokeOpacity: 0.8,
-                strokeWeight: 4
-              });
-              fitBounds(origin, destination);
-              console.warn("Directions error:", status, { origin, destination });
-            }
-          }
-        );
-      };
-
-      if ("geolocation" in navigator) {
-        navigator.geolocation.getCurrentPosition(
-          (pos) => requestAll({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-          ()   => requestAll(DEFAULT_ORIGIN),
-          GEO_OPTIONS
-        );
+    function openDestInfo(key){
+      const d = destinations[key];
+      let html = `<div style="min-width:180px"><strong>${d.name}</strong>`;
+      if (myPos) {
+        const dist = haversine(myPos, d);
+        html += `<br/>Distance from you: <b>${fmtKm(dist)}</b>`;
       } else {
-        requestAll(DEFAULT_ORIGIN);
+        html += `<br/><em>Enable location to see distance.</em>`;
       }
+      html += `</div>`;
+      infoWindow.setContent(html);
+      infoWindow.open({ map, anchor: destMarkers[key] });
+      map.panTo(d);
+    }
+
+    function focusDest(key){
+      // 버튼용: 해당 목적지로 포커스 + 인포윈도 열기
+      openDestInfo(key);
     }
   </script>
 
