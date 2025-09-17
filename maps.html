@@ -45,7 +45,7 @@
     const DEFAULT_ORIGIN = destinations.shilla;
     const GEO_OPTIONS = { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 };
 
-    let map, directionsService, directionsRenderer;
+    let map, directionsService, directionsRenderer, distanceService, fallbackLine = null;
     const routeInfoDiv = document.getElementById("routeInfo");
 
     function initMap() {
@@ -53,39 +53,86 @@
         zoom: 13,
         center: { lat: 37.5665, lng: 126.9780 }, // 서울 시청 부근
       });
-      directionsService = new google.maps.DirectionsService();
+      directionsService  = new google.maps.DirectionsService();
       directionsRenderer = new google.maps.DirectionsRenderer();
       directionsRenderer.setMap(map);
+      distanceService    = new google.maps.DistanceMatrixService();
     }
 
-    // ✅ 경로 요청: 도보만 사용. 실패 시 기본 출발지(신라호텔)에서 한 번만 재시도.
+    // 📐 Haversine 거리(m)
+    function haversine(a, b){
+      const R = 6371000; // m
+      const toRad = d => d * Math.PI / 180;
+      const dLat = toRad(b.lat - a.lat);
+      const dLng = toRad(b.lng - a.lng);
+      const lat1 = toRad(a.lat), lat2 = toRad(b.lat);
+      const h = Math.sin(dLat/2)**2 + Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLng/2)**2;
+      return 2*R*Math.asin(Math.sqrt(h));
+    }
+    const fmtKm = (m)=> `${(m/1000).toFixed(1)} km`;
+    const estWalkSec = (m)=> Math.round(m / 1.33); // 1.33 m/s ≈ 4.8 km/h
+    function fmtDur(sec){
+      const h = Math.floor(sec/3600), m = Math.round((sec%3600)/60);
+      return h ? `${h}h ${m}m` : `${m} min`;
+    }
+
+    function clearOverlays(){
+      directionsRenderer.setMap(null);
+      directionsRenderer = new google.maps.DirectionsRenderer();
+      directionsRenderer.setMap(map);
+      if (fallbackLine){ fallbackLine.setMap(null); fallbackLine = null; }
+    }
+
+    function fitBounds(a, b){
+      const bounds = new google.maps.LatLngBounds();
+      bounds.extend(a); bounds.extend(b);
+      map.fitBounds(bounds, 64);
+    }
+
+    // ✅ 경로 요청: 도보 우선. ZERO_RESULTS 등일 때 직선거리로 안내 + 대체 폴리라인 표시.
     function routeTo(key) {
       const destination = destinations[key];
 
-      const isSameCoord = (a, b) => a && b && a.lat === b.lat && a.lng === b.lng;
+      const requestAll = (origin) => {
+        clearOverlays();
 
-      const requestWalking = (origin) => {
-        // 이전 경로 리셋
-        directionsRenderer.setMap(null);
-        directionsRenderer = new google.maps.DirectionsRenderer();
-        directionsRenderer.setMap(map);
+        // 1) 도보 Distance Matrix (시간/거리 먼저 계산)
+        distanceService.getDistanceMatrix({
+          origins: [origin],
+          destinations: [destination],
+          travelMode: google.maps.TravelMode.WALKING
+        }, (res, status) => {
+          let topLine = "", subLine = "";
 
+          if (status === "OK" && res.rows[0].elements[0].status === "OK") {
+            const el = res.rows[0].elements[0];
+            topLine = `🚶 From your location → Destination`;
+            subLine = `⏱️ ${el.duration.text} (${el.distance.text})`;
+          } else {
+            // 거리/시간 못 받으면 Haversine로 근사
+            const m = haversine(origin, destination);
+            topLine = `🚶 (Approx.) From your location → Destination`;
+            subLine = `⏱️ ~${fmtDur(estWalkSec(m))} (${fmtKm(m)})`;
+          }
+          routeInfoDiv.innerText = `${topLine}\n${subLine}`;
+        });
+
+        // 2) 도보 Directions (실제 경로 그리기)
         directionsService.route(
           { origin, destination, travelMode: google.maps.TravelMode.WALKING },
           (response, status) => {
             if (status === "OK") {
               directionsRenderer.setDirections(response);
-              const leg = response.routes[0].legs[0];
-              routeInfoDiv.innerText = `🚶 ${leg.start_address} → ${leg.end_address}\n⏱️ ${leg.duration.text} (${leg.distance.text})`;
             } else {
+              // ZERO_RESULTS 등 → 직선 폴리라인으로 대체 표기
+              fallbackLine = new google.maps.Polyline({
+                path: [origin, destination],
+                map,
+                strokeOpacity: 0.8,
+                strokeWeight: 4
+              });
+              fitBounds(origin, destination);
               console.warn("Directions error:", status, { origin, destination });
-              // 기본 출발지로 아직 시도하지 않았다면 한 번 재시도
-              if (!isSameCoord(origin, DEFAULT_ORIGIN)) {
-                requestWalking(DEFAULT_ORIGIN);
-              } else {
-                alert("경로를 찾을 수 없습니다: " + status);
-                routeInfoDiv.innerText = "";
-              }
             }
           }
         );
@@ -93,23 +140,17 @@
 
       if ("geolocation" in navigator) {
         navigator.geolocation.getCurrentPosition(
-          (pos) => {
-            const origin = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-            requestWalking(origin);
-          },
-          (err) => {
-            console.warn("Geolocation error:", err);
-            requestWalking(DEFAULT_ORIGIN);
-          },
+          (pos) => requestAll({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+          ()   => requestAll(DEFAULT_ORIGIN),
           GEO_OPTIONS
         );
       } else {
-        requestWalking(DEFAULT_ORIGIN);
+        requestAll(DEFAULT_ORIGIN);
       }
     }
   </script>
 
-  <!-- ✅ Google Maps API (반드시 HTTPS/localhost에서 테스트) -->
+  <!-- ✅ Google Maps API (HTTPS/localhost 권장) -->
   <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAfHkgQ8w0T0-JlGESZiLbFAAgULg46I4A&callback=initMap">
   </script>
